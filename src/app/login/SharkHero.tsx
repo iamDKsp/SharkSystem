@@ -60,7 +60,7 @@ const RY = 65;
 const TILT_SIN = Math.sin((25 * Math.PI) / 180);
 const ORBIT_Y = -15;
 
-export function SharkHero() {
+export function SharkHero({ compact = false }: { compact?: boolean }) {
   const [t, setT] = useState(0);
   const rafRef = useRef<number | null>(null);
   const startRef = useRef<number | null>(null);
@@ -98,7 +98,7 @@ export function SharkHero() {
   );
 
   return (
-    <div className="relative mx-auto flex h-[190px] sm:h-[270px] w-full max-w-[380px] items-center justify-center [perspective:1000px] select-none pointer-events-none scale-[0.78] sm:scale-100 origin-center">
+    <div className={`relative mx-auto flex w-full max-w-[380px] items-center justify-center [perspective:1000px] select-none pointer-events-none origin-center ${compact ? "h-[160px] scale-[0.72]" : "h-[190px] sm:h-[270px] scale-[0.78] sm:scale-100"}`}>
       {/* CSS das animações e keyframes originais de lux-orbit-zen */}
       <style jsx global>{`
         @keyframes shark-breathe-zen {
