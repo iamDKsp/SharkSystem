@@ -1,25 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, Zap, TrendingUp, DollarSign } from "lucide-react";
-import Image from "next/image";
-import sharkAvatar from "./shark-avatar.png";
-
-interface OrbitingIcon {
-  id: number;
-  icon: React.ReactNode;
-  initialPhase: number;
-  period: number;
-  floatPhaseOffset: number;
-  isGold: boolean;
-  tiltRotation: string; // Inclinação 3D para dar o aspecto de bloco 3D
-}
-
-interface OrbitingDot {
-  id: number;
-  phaseOffset: number;
-}
+import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Wifi, Battery, Zap } from "lucide-react";
+import { SharkHero } from "./SharkHero";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,85 +12,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  // Time state for 60fps animations
-  const [time, setTime] = useState(0);
-
-  useEffect(() => {
-    let animationFrameId: number;
-    let startTime = performance.now();
-
-    const updateFrame = (now: number) => {
-      const elapsed = (now - startTime) / 1000;
-      setTime(elapsed);
-      animationFrameId = requestAnimationFrame(updateFrame);
-    };
-
-    animationFrameId = requestAnimationFrame(updateFrame);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  // Definição dos blocos 3D de alta fidelidade
-  const orbitingIcons: OrbitingIcon[] = [
-    {
-      id: 0,
-      icon: <Shield className="w-6 h-6 text-[#5af0b9] drop-shadow-[0_0_6px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
-      initialPhase: 0,
-      period: 11.5,
-      floatPhaseOffset: 0.0,
-      isGold: false,
-      tiltRotation: "rotateX(12deg) rotateY(-15deg)"
-    },
-    {
-      id: 1,
-      icon: <DollarSign className="w-6 h-6 text-[#ffd56b] drop-shadow-[0_0_6px_rgba(255,213,107,0.6)]" strokeWidth={2.5} />,
-      initialPhase: Math.PI / 2 + 0.4,
-      period: 12.5,
-      floatPhaseOffset: 1.5,
-      isGold: true,
-      tiltRotation: "rotateX(10deg) rotateY(15deg)"
-    },
-    {
-      id: 2,
-      icon: <Zap className="w-6 h-6 text-[#5af0b9] fill-[#5af0b9]/25 drop-shadow-[0_0_6px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
-      initialPhase: Math.PI + 0.15,
-      period: 11.8,
-      floatPhaseOffset: 3.0,
-      isGold: false,
-      tiltRotation: "rotateX(-12deg) rotateY(-10deg)"
-    },
-    {
-      id: 3,
-      icon: <TrendingUp className="w-6 h-6 text-[#5af0b9] drop-shadow-[0_0_6px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
-      initialPhase: (3 * Math.PI) / 2 - 0.25,
-      period: 12.2,
-      floatPhaseOffset: 4.5,
-      isGold: false,
-      tiltRotation: "rotateX(-10deg) rotateY(12deg)"
-    }
-  ];
-
-  // Pequenos pontos de neon brilhantes que correm no trilho da órbita
-  const orbitDots: OrbitingDot[] = [
-    { id: 0, phaseOffset: 0 },
-    { id: 1, phaseOffset: Math.PI / 4 },
-    { id: 2, phaseOffset: Math.PI / 2 },
-    { id: 3, phaseOffset: Math.PI },
-    { id: 4, phaseOffset: (5 * Math.PI) / 4 },
-    { id: 5, phaseOffset: (3 * Math.PI) / 2 }
-  ];
-
-  // Geometria da órbita elíptica inclinada 3D para encaixar exatamente na imagem
-  const rx = 120; // Raio horizontal
-  const rz = 90;  // Raio de profundidade
-  const tiltAngle = 22 * (Math.PI / 180); // Inclinação de 22 graus para o efeito de anel
-
-  // Animações do Tubarão
-  const sharkY = Math.sin((2 * Math.PI * time) / 4.5) * 3; // Flutuação vertical de 3px
-  const sharkRot = Math.cos((2 * Math.PI * time) / 9) * 1.5; // Balanço de 1.5°
-  const reflectionCycle = time % 6.5;
-  const showReflection = reflectionCycle < 1.2;
-  const reflectionOffset = showReflection ? (reflectionCycle / 1.2) * 220 - 60 : -60;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -137,7 +42,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full bg-[#01100b] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden relative">
       {/* Background Teal bloom glow */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-emerald-500/5 rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-[#10b981]/5 rounded-full blur-[160px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
       <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#021812] sm:rounded-[44px] shadow-2xl shadow-black/95 border-0 sm:border-[8px] sm:border-[#064e3b]/80 flex flex-col justify-between relative overflow-hidden">
@@ -155,138 +60,16 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* HERO SECTION */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-4 pb-2 z-20 relative select-none">
+        {/* HERO SECTION - REPRODUCING LUX-ORBIT-ZEN SHARKHERO */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-2 pb-1 z-20 relative select-none">
           
-          {/* 3D SCENE ROOT CONTAINER */}
-          <div className="relative w-64 h-64 flex items-center justify-center shrink-0">
-            
-            {/* GLOW DE FUNDO REALÍSTICO (Luz rim teal de trás do mascote) */}
-            <div className="absolute w-44 h-44 rounded-full bg-[#10b981]/15 blur-[35px] z-0 pointer-events-none" />
+          {/* SHARK HERO COMPONENT */}
+          <SharkHero />
 
-            {/* TRILHO DA ÓRBITA: Centrado de forma absoluta e fixo */}
-            <svg 
-              className="absolute w-[270px] h-[100px] pointer-events-none z-0 overflow-visible left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" 
-              style={{ transform: `rotateX(65deg) rotateZ(-15deg)` }}
-            >
-              <ellipse 
-                cx="135" 
-                cy="50" 
-                rx="120" 
-                ry="45" 
-                fill="none" 
-                stroke="rgba(16, 185, 129, 0.25)" 
-                strokeWidth="1.5"
-                className="filter drop-shadow-[0_0_6px_rgba(16, 185, 129, 0.7)]"
-              />
-            </svg>
-
-            {/* PONTOS DE NEON ORBITAIS (Absolutamente centrados e correndo no trilho) */}
-            {orbitDots.map(dot => {
-              const theta = 0.5 * time + dot.phaseOffset;
-              const cx = 120 * Math.cos(theta);
-              const cz = 45 * Math.sin(theta);
-              
-              const cy = -cz * Math.sin(tiltAngle);
-              const finalZ = cz * Math.cos(tiltAngle);
-              
-              const zIndex = finalZ > 0 ? 25 : 4;
-
-              return (
-                <div
-                  key={dot.id}
-                  className="absolute w-1.5 h-1.5 rounded-full bg-[#5af0b9] shadow-[0_0_8px_#10b981,0_0_12px_#10b981] left-1/2 top-1/2 transition-all duration-75 will-change-transform"
-                  style={{
-                    transform: `translate3d(calc(-50% + ${cx}px), calc(-50% + ${cy}px), ${finalZ}px)`,
-                    zIndex: zIndex,
-                    opacity: finalZ > 0 ? 1 : 0.4
-                  }}
-                />
-              );
-            })}
-
-            {/* MASCOTE DO TUBARÃO GIGANTE */}
-            <div 
-              className="w-56 h-56 relative flex items-center justify-center z-10 transition-transform duration-75 will-change-transform"
-              style={{ 
-                transform: `translateY(${sharkY}px) rotate(${sharkRot}deg) translateZ(0px)`
-              }}
-            >
-              <div className="w-full h-full relative overflow-visible flex items-center justify-center">
-                <Image
-                  src={sharkAvatar}
-                  alt="Shark Mascot"
-                  placeholder="blur"
-                  className="w-full h-full object-contain filter drop-shadow-[0_16px_28px_rgba(0,0,0,0.8)]"
-                  priority
-                />
-
-                {/* Brilho Linear nos Óculos de Sol */}
-                <div className="absolute top-[48px] left-[65px] w-[105px] h-[34px] overflow-hidden rounded-md pointer-events-none z-20 opacity-30 mix-blend-overlay">
-                  <div 
-                    className="w-7 h-[70px] bg-white blur-[2px] transform rotate-30 absolute transition-all duration-75"
-                    style={{
-                      left: `${reflectionOffset}px`
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* BLOCOS 3D EM ÓRBITA REALISTA (Centrados com left-1/2 e top-1/2 para fixação perfeita no mobile) */}
-            {orbitingIcons.map(icon => {
-              const theta = ((2 * Math.PI) / icon.period) * time + icon.initialPhase;
-              
-              const cx = rx * Math.cos(theta);
-              const cz = rz * Math.sin(theta); 
-              
-              const cy = -cz * Math.sin(tiltAngle);
-              const yFloat = Math.sin((2 * Math.PI * time) / 3.5 + icon.floatPhaseOffset) * 5;
-              const finalY = cy + yFloat;
-
-              const finalZ = cz * Math.cos(tiltAngle);
-              const maxZ = rz * Math.cos(tiltAngle);
-              const normDepth = finalZ / maxZ;
-
-              const scale = 0.95 + 0.2 * normDepth;
-              const opacity = 0.8 + 0.2 * normDepth;
-              const blur = Math.max(0, (1 - normDepth) * 1.5);
-              const shadowOpacity = 0.2 + 0.45 * ((normDepth + 1) / 2);
-
-              const zIndex = finalZ > 0 ? 30 : 5;
-
-              return (
-                <div
-                  key={icon.id}
-                  className="absolute w-15 h-15 rounded-[22px] border flex items-center justify-center left-1/2 top-1/2 transition-all duration-75 will-change-transform shadow-2xl"
-                  style={{
-                    transform: `translate3d(calc(-50% + ${cx}px), calc(-50% + ${finalY}px), ${finalZ}px) scale(${scale}) ${icon.tiltRotation}`,
-                    opacity: opacity,
-                    filter: `blur(${blur}px)`,
-                    zIndex: zIndex,
-                    boxShadow: `
-                      0 ${12 * scale}px ${24 * scale}px rgba(0, 0, 0, ${shadowOpacity}),
-                      inset 0 2px 4px rgba(255, 255, 255, ${icon.isGold ? 0.25 : 0.12})
-                    `,
-                    background: icon.isGold 
-                      ? "linear-gradient(135deg, #a77013 0%, #462e03 100%)"
-                      : "linear-gradient(135deg, #0d3827 0%, #031710 100%)",
-                    borderColor: icon.isGold
-                      ? "rgba(251, 191, 36, 0.55)"
-                      : "rgba(52, 211, 153, 0.45)"
-                  }}
-                >
-                  {icon.icon}
-                </div>
-              );
-            })}
-
-          </div>
-
-          {/* Top Brand Tag */}
+          {/* Top Brand Tag (Espaçamento ideal de 50px do tubarão) */}
           <div 
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#053728] border border-emerald-500/40 shrink-0 shadow-lg z-30"
-            style={{ marginTop: "48px" }}
+            style={{ marginTop: "10px" }}
           >
             <Zap className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
             <span className="text-[11px] font-extrabold text-white tracking-[0.2em] uppercase">
