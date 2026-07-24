@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp } from "lucide-react";
+import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp, CircleDollarSign } from "lucide-react";
 import Image from "next/image";
 import sharkAvatar from "./shark-avatar.png";
 
@@ -24,11 +24,11 @@ export default function LoginPage() {
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
     
-    // Smooth 3D rotation limits (max 18 degrees tilt)
-    const rx = -(y / (rect.height / 2)) * 16;
-    const ry = (x / (rect.width / 2)) * 16;
-    const tx = (x / (rect.width / 2)) * 8;
-    const ty = (y / (rect.height / 2)) * 8;
+    // Rotation tilt values for 3D camera effect
+    const rx = -(y / (rect.height / 2)) * 14;
+    const ry = (x / (rect.width / 2)) * 14;
+    const tx = (x / (rect.width / 2)) * 10;
+    const ty = (y / (rect.height / 2)) * 10;
 
     setTilt({ rx, ry, tx, ty });
   };
@@ -64,17 +64,17 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#021812] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
-      {/* Dynamic Background Ambient Glows */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
+    <div className="min-h-screen w-full bg-[#01140e] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
+      {/* Ambient Radial Lighting */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/15 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[350px] h-[350px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
-      <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#03241b] sm:rounded-[44px] shadow-2xl shadow-black/80 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
+      <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#021f17] sm:rounded-[44px] shadow-2xl shadow-black/90 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
         
         {/* Ambient Decorative Orbs */}
         <div className="absolute top-14 left-6 w-4 h-4 rounded-full bg-emerald-500/20 blur-[1px] animate-pulse" />
         <div className="absolute top-24 right-7 w-5 h-5 rounded-full bg-emerald-400/25 blur-[1px]" />
-        <div className="absolute top-44 left-5 w-3.5 h-3.5 rounded-full bg-emerald-300/20 blur-[1px]" />
 
         {/* Top Mobile Bar Header */}
         <div className="pt-3.5 px-6 flex items-center justify-between z-40 text-emerald-100/90 text-xs font-semibold tracking-tight shrink-0">
@@ -89,95 +89,100 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Top Header Section (INTERACTIVE 3D PARALLAX CAMERA HERO) */}
+        {/* TOP HERO SECTION: 3D POP-OUT SMARTPHONE DISPLAY EFFECT */}
         <div 
           ref={containerRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-20 relative cursor-pointer"
-          style={{ perspective: "1000px" }}
+          style={{ perspective: "1200px" }}
         >
-          {/* 3D PARALLAX CONTAINER WRAPPER */}
+          {/* 3D SCENE ROOT CONTAINER */}
           <div 
-            className="relative w-56 h-56 sm:w-60 sm:h-60 my-1 flex items-center justify-center shrink-0 transition-transform duration-200 ease-out"
+            className="relative w-full h-[270px] my-1 flex items-center justify-center shrink-0 transition-transform duration-200 ease-out"
             style={{
               transformStyle: "preserve-3d",
               transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`
             }}
           >
-            
-            {/* LAYER -1 (Fundo): Dashed outer orbit ring */}
+            {/* LAYER -2: 3D Floor Shadow */}
             <div 
-              className="absolute inset-[-10px] rounded-full border-[2px] border-dashed border-emerald-400/35 animate-spin" 
-              style={{ 
-                animationDuration: '28s',
-                transform: `translateZ(-30px)`
-              }} 
+              className="absolute bottom-2 w-48 h-8 rounded-full bg-black/60 blur-[12px]" 
+              style={{ transform: `translateZ(-40px) scaleY(0.4)` }}
             />
 
-            {/* LAYER 0 (Trás): Glowing 3D Laser Ray Ring (Passa por trás do Tubarão) */}
+            {/* LAYER -1: 3D Inner Screen Frame Glow */}
             <div 
-              className="absolute w-[240px] h-[75px] rounded-[100%] border-[4px] border-emerald-400/90 shadow-[0_0_30px_rgba(52,211,153,0.8)] transform -rotate-12 animate-pulse"
-              style={{ transform: `translateZ(-15px) rotateX(60deg) rotateZ(-12deg)` }}
+              className="absolute w-[180px] h-[220px] rounded-[32px] bg-gradient-to-b from-[#064e3b]/40 to-transparent border border-emerald-500/30 shadow-inner"
+              style={{ transform: `translateZ(-20px)` }}
             />
 
-            {/* LAYER 1 (Meio): TUBARÃO 3D GIGANTE - SEM CORTES NA CABEÇA OU CORPO */}
+            {/* LAYER 0: 3D Laser Green Orbit Ring (Passing Behind Tubarão) */}
             <div 
-              className="w-48 h-48 sm:w-52 sm:h-52 relative flex items-center justify-center transition-transform duration-300 drop-shadow-[0_15px_30px_rgba(0,0,0,0.7)]"
-              style={{ transform: `translateZ(45px)` }}
+              className="absolute w-[260px] h-[85px] rounded-[100%] border-[4px] border-emerald-400/80 shadow-[0_0_35px_rgba(52,211,153,0.8)] animate-pulse"
+              style={{ transform: `translateZ(-10px) rotateX(65deg) rotateZ(-15deg)` }}
+            />
+
+            {/* LAYER 1: TUBARÃO GIGANTE EM 3D POP-OUT (SAINDO DA TELA) */}
+            <div 
+              className="w-56 h-56 sm:w-60 sm:h-60 relative flex items-center justify-center filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)] z-20"
+              style={{ transform: `translateZ(55px) translateY(-10px)` }}
             >
               <Image
                 src={sharkAvatar}
-                alt="Shark System Avatar"
+                alt="Shark System 3D Pop Out"
                 placeholder="blur"
-                className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(16,185,129,0.3)] transform scale-115"
+                className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(16,185,129,0.4)] transform scale-125"
                 priority
               />
             </div>
 
-            {/* LAYER 2 (Frente): Floating 3D Parallax Icons (MAIORES E COM PROFUNDIDADE 3D) */}
+            {/* LAYER 2: FLOATING 3D PARALLAX BADGES & COINS (VOLTANDO EM VOLTA EM 3D) */}
 
-            {/* Ícone 1: Escudo 3D (Top Left) */}
+            {/* Floating 3D Badge 1: Escudo 3D (Top Left) */}
             <div 
-              className="absolute top-0 -left-3 z-30 p-3 rounded-2xl bg-[#064e3b]/95 backdrop-blur-md border-2 border-emerald-400 shadow-[0_10px_25px_rgba(0,0,0,0.5)] text-emerald-300 transition-transform duration-200"
-              style={{ transform: `translateZ(75px) translate(${tilt.tx * 1.5}px, ${tilt.ty * 1.5}px)` }}
+              className="absolute top-2 left-2 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-emerald-300 flex items-center gap-1.5 transition-transform duration-200"
+              style={{ transform: `translateZ(95px) translate(${tilt.tx * 1.6}px, ${tilt.ty * 1.6}px) rotate(-8deg)` }}
             >
-              <Shield className="w-6 h-6 stroke-[2.5]" />
+              <Shield className="w-5 h-5 text-emerald-300 fill-emerald-300/20" />
             </div>
 
-            {/* Ícone 2: Cifrão 3D (Top Right) */}
+            {/* Floating 3D Badge 2: Moeda de Ouro 3D (Top Right) */}
             <div 
-              className="absolute top-1 -right-3 z-30 p-3 rounded-2xl bg-[#064e3b]/95 backdrop-blur-md border-2 border-emerald-400 shadow-[0_10px_25px_rgba(0,0,0,0.5)] text-emerald-300 transition-transform duration-200"
-              style={{ transform: `translateZ(85px) translate(${tilt.tx * -1.5}px, ${tilt.ty * 1.5}px)` }}
+              className="absolute top-4 right-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 border-2 border-amber-300 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-white flex items-center gap-1 transition-transform duration-200 animate-bounce"
+              style={{ 
+                animationDuration: '4s',
+                transform: `translateZ(105px) translate(${tilt.tx * -1.6}px, ${tilt.ty * 1.6}px) rotate(12deg)` 
+              }}
             >
-              <DollarSign className="w-6 h-6 stroke-[2.5]" />
+              <CircleDollarSign className="w-5 h-5 text-amber-200 fill-amber-300/30" />
             </div>
 
-            {/* Ícone 3: Raio Verde 3D (Bottom Left) */}
+            {/* Floating 3D Badge 3: Raio Verde 3D (Bottom Left) */}
             <div 
-              className="absolute bottom-1 -left-3 z-30 p-3 rounded-2xl bg-[#064e3b]/95 backdrop-blur-md border-2 border-emerald-400 shadow-[0_10px_25px_rgba(0,0,0,0.5)] text-emerald-300 transition-transform duration-200"
-              style={{ transform: `translateZ(90px) translate(${tilt.tx * 1.8}px, ${tilt.ty * -1.5}px)` }}
+              className="absolute bottom-4 left-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-200"
+              style={{ transform: `translateZ(100px) translate(${tilt.tx * 1.8}px, ${tilt.ty * -1.6}px) rotate(10deg)` }}
             >
-              <Zap className="w-6 h-6 text-emerald-300 fill-emerald-300" />
+              <Zap className="w-5 h-5 text-emerald-300 fill-emerald-300" />
             </div>
 
-            {/* Ícone 4: Gráfico 3D (Bottom Right) */}
+            {/* Floating 3D Badge 4: Cifrão 3D (Bottom Right) */}
             <div 
-              className="absolute bottom-2 -right-3 z-30 p-3 rounded-2xl bg-[#064e3b]/95 backdrop-blur-md border-2 border-emerald-400 shadow-[0_10px_25px_rgba(0,0,0,0.5)] text-emerald-300 transition-transform duration-200"
-              style={{ transform: `translateZ(80px) translate(${tilt.tx * -1.8}px, ${tilt.ty * -1.5}px)` }}
+              className="absolute bottom-5 right-2 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-200"
+              style={{ transform: `translateZ(90px) translate(${tilt.tx * -1.8}px, ${tilt.ty * -1.6}px) rotate(-10deg)` }}
             >
-              <TrendingUp className="w-6 h-6 stroke-[2.5]" />
+              <TrendingUp className="w-5 h-5 text-emerald-300" />
             </div>
 
-            {/* LAYER 3 (Frente Extrema): Halo Frontal de Brilho do Raio */}
+            {/* LAYER 3: Laser Front Arc Overlay (Passando na Frente do Tubarão) */}
             <div 
-              className="absolute w-[240px] h-[75px] rounded-[100%] border-t-[4px] border-emerald-300 shadow-[0_0_20px_rgba(52,211,153,0.9)] transform -rotate-12 pointer-events-none"
-              style={{ transform: `translateZ(60px) rotateX(60deg) rotateZ(-12deg)` }}
+              className="absolute w-[260px] h-[85px] rounded-[100%] border-t-[4px] border-emerald-300 shadow-[0_0_25px_rgba(52,211,153,1)] transform -rotate-12 pointer-events-none z-30"
+              style={{ transform: `translateZ(70px) rotateX(65deg) rotateZ(-15deg)` }}
             />
           </div>
 
-          {/* Top Brand Tag (Acima do texto grande) */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 mb-1 mt-3 shrink-0 shadow-md">
+          {/* Top Brand Tag */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 mb-1 mt-1 shrink-0 shadow-lg z-30">
             <Zap className="w-3.5 h-3.5 text-emerald-300 fill-emerald-300" />
             <span className="text-[11px] font-extrabold text-white tracking-[0.2em] uppercase">
               SHARK SYSTEM
@@ -185,12 +190,12 @@ export default function LoginPage() {
           </div>
 
           {/* Big Main Title: Seja Bem-vindo! */}
-          <h1 className="text-2xl sm:text-3xl font-black text-center text-white tracking-tight leading-tight drop-shadow-md shrink-0">
+          <h1 className="text-2xl sm:text-3xl font-black text-center text-white tracking-tight leading-tight drop-shadow-md shrink-0 z-30">
             Seja Bem-vindo!
           </h1>
           
           {/* Subtitle */}
-          <p className="text-[11px] text-emerald-200/70 font-medium text-center mt-0.5 max-w-[230px] shrink-0">
+          <p className="text-[11px] text-emerald-200/70 font-medium text-center mt-0.5 max-w-[230px] shrink-0 z-30">
             Acesse o painel para gerenciar suas operações financeiras
           </p>
         </div>
