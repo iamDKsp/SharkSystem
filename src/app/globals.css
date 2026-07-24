@@ -52,6 +52,12 @@ body {
   min-height: 100vh;
 }
 
+/* Ocultar o botão flutuante 'N' do Next.js Dev Tools */
+[aria-label="Next.js Dev Tools"],
+[data-nextjs-toast-wrapper] {
+  display: none !important;
+}
+
 /* Custom premium scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

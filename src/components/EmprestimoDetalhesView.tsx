@@ -49,10 +49,23 @@ export default function EmprestimoDetalhesView({ emprestimo }: { emprestimo: Emp
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [modal, setModal] = useState<null | "renegociar" | "reprogramar" | "delete" | "wa">(null);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [waConfigMode, setWaConfigMode] = useState(false);
   const [waTemplates, setWaTemplates] = useState<string[]>([]);
   const [waCustomMsg, setWaCustomMsg] = useState("");
   const [isWaSending, setIsWaSending] = useState(false);
+
+  // Módulo 3: detectar rota de origem para navegação correta
+  const handleVoltar = () => {
+    const referrer = document.referrer;
+    if (referrer.includes("/cobrancas")) {
+      router.push("/cobrancas");
+    } else if (referrer.includes("/clientes")) {
+      router.push(`/clientes/${emprestimo.cliente.id}`);
+    } else {
+      router.back();
+    }
+  };
 
   const [valorAbater, setValorAbater] = useState("");
   const [aplicarJuros, setAplicarJuros] = useState(false);
@@ -164,6 +177,10 @@ export default function EmprestimoDetalhesView({ emprestimo }: { emprestimo: Emp
     startTransition(async () => { await toggleClientBlacklist(emprestimo.cliente.id, emprestimo.cliente.blacklist, emprestimo.id); });
   };
   const excluir = () => {
+    if (deleteConfirmText !== "EXCLUIR") {
+      alert('Digite "EXCLUIR" para confirmar.');
+      return;
+    }
     startTransition(async () => {
       const res = await deleteLoan(emprestimo.id);
       if (res?.success && res?.redirectUrl) router.push(res.redirectUrl);
@@ -243,11 +260,11 @@ export default function EmprestimoDetalhesView({ emprestimo }: { emprestimo: Emp
 
       {/* Top bar */}
       <div className="flex items-center justify-between py-1">
-        <Link href="/emprestimos" className="flex items-center gap-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-white text-sm font-semibold transition-colors group">
+        <button onClick={handleVoltar} className="flex items-center gap-1.5 text-zinc-400 hover:text-zinc-800 dark:hover:text-white text-sm font-semibold transition-colors group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" /> Voltar
-        </Link>
+        </button>
         {isPending && <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />}
-        <button onClick={() => setModal("delete")} className="flex items-center gap-1.5 text-sm font-black text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 border border-rose-200 dark:border-rose-500/20 px-3 py-1.5 rounded-xl transition-all">
+        <button onClick={() => { setDeleteConfirmText(""); setModal("delete"); }} className="flex items-center gap-1.5 text-sm font-black text-rose-500 hover:text-rose-600 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 border border-rose-200 dark:border-rose-500/20 px-3 py-1.5 rounded-xl transition-all">
           <Trash2 className="w-3.5 h-3.5" /> Excluir
         </button>
       </div>
@@ -570,9 +587,26 @@ export default function EmprestimoDetalhesView({ emprestimo }: { emprestimo: Emp
             <AlertTriangle className="w-5 h-5 text-rose-500 flex-shrink-0" />
             <p className="text-sm text-rose-700 dark:text-rose-300 font-semibold">Todos os dados deste empréstimo, incluindo parcelas e histórico, serão permanentemente removidos.</p>
           </div>
+          {/* Módulo 5: Proteção contra exclusão acidental — exige confirmação por texto */}
+          <div>
+            <label className="text-sm font-black uppercase tracking-widest text-zinc-400 mb-2 block">
+              Digite <span className="text-rose-500 font-black">EXCLUIR</span> para confirmar
+            </label>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              placeholder="EXCLUIR"
+              className="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/40 focus:border-rose-500 transition-all placeholder:text-zinc-400 font-mono tracking-widest"
+            />
+          </div>
           <div className="flex gap-2">
             <button onClick={() => setModal(null)} className="flex-1 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-sm font-black rounded-xl transition-colors">Cancelar</button>
-            <button onClick={() => { setModal(null); excluir(); }} disabled={isPending} className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm">
+            <button
+              onClick={() => { setModal(null); excluir(); }}
+              disabled={isPending || deleteConfirmText !== "EXCLUIR"}
+              className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
               {isPending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />} Excluir Definitivamente
             </button>
           </div>

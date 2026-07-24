@@ -63,10 +63,14 @@ model Emprestimo {
   parceiro_id      String?
   parceiro         Parceiro? @relation(fields: [parceiro_id], references: [id], onDelete: SetNull)
 
+  // Pipeline de Cobrança — timestamp de quando o cliente foi cobrado no dia
+  cobrado_em       DateTime? @db.Timestamptz
+
   criado_em        DateTime @default(now())
 
   @@map("emprestimos")
 }
+
 
 model Parceiro {
   id          String       @id @default(uuid())

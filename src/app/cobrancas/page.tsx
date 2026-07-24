@@ -51,6 +51,7 @@ export default async function CobrancasPage() {
           valor_emprestado: valorEmprestadoNum,
           taxa_juros: taxaJurosNum,
           tipo_pagamento: emp.tipo_pagamento,
+          cobrado_em: emp.cobrado_em ? emp.cobrado_em.toISOString() : null,
           cliente: {
             id: emp.cliente.id,
             nome: emp.cliente.nome,
@@ -58,6 +59,7 @@ export default async function CobrancasPage() {
           },
         },
       };
+
 
       if (vencimentoUTC < hojeUTC) {
         atrasados.push(serializedParcela);

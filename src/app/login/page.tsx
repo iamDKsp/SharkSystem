@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles } from "lucide-react";
+import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp } from "lucide-react";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,20 +41,21 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen w-full bg-[#021812] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
-      {/* Background ambient glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Dynamic Background Ambient Glows */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-teal-600/10 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
-      <div className="w-full max-w-[390px] h-screen sm:h-[780px] bg-[#03241b] sm:rounded-[44px] shadow-2xl shadow-black/80 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
+      <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#03241b] sm:rounded-[44px] shadow-2xl shadow-black/80 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
         
-        {/* Ambient Decorative Dots */}
-        <div className="absolute top-14 left-6 w-4 h-4 rounded-full bg-emerald-500/15 blur-[1px]" />
-        <div className="absolute top-24 right-7 w-5 h-5 rounded-full bg-emerald-400/20 blur-[1px]" />
+        {/* Ambient Decorative Orbs */}
+        <div className="absolute top-14 left-6 w-4 h-4 rounded-full bg-emerald-500/20 blur-[1px] animate-pulse" />
+        <div className="absolute top-24 right-7 w-5 h-5 rounded-full bg-emerald-400/25 blur-[1px]" />
         <div className="absolute top-44 left-5 w-3.5 h-3.5 rounded-full bg-emerald-300/20 blur-[1px]" />
-        <div className="absolute top-[280px] right-6 w-4 h-4 rounded-full bg-emerald-400/15 blur-[0.5px]" />
+        <div className="absolute top-[280px] right-6 w-4 h-4 rounded-full bg-emerald-400/20 blur-[0.5px]" />
 
         {/* Top Mobile Bar Header */}
-        <div className="pt-3 px-6 flex items-center justify-between z-20 text-emerald-100/90 text-xs font-semibold tracking-tight shrink-0">
+        <div className="pt-3 px-6 flex items-center justify-between z-30 text-emerald-100/90 text-xs font-semibold tracking-tight shrink-0">
           <span>9:41</span>
           {/* Dynamic Island Notch */}
           <div className="w-24 h-4.5 bg-[#01140e] rounded-full flex items-center justify-end px-2.5 gap-1.5 border border-emerald-900/40 shadow-inner">
@@ -65,41 +67,64 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Top Header Section (Avatars & Refined Typographic Titles) */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-2 z-10 relative">
+        {/* Top Header Section (Large Shark Avatar & 3D Orbital Parallax) */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-10 relative">
           
-          {/* 3D Avatars Cluster */}
-          <div className="relative w-44 h-28 mb-3 flex items-center justify-center shrink-0">
+          {/* 3D PARALLAX SHARK AVATAR CONTAINER */}
+          <div className="relative w-48 h-48 sm:w-52 sm:h-52 my-1 flex items-center justify-center shrink-0 perspective-1000">
             
-            {/* Avatar Top Left */}
-            <div className="absolute top-0 left-3 w-13 h-13 rounded-full bg-[#064e3b] p-[2px] shadow-lg border border-emerald-400/30 transform -rotate-6">
-              <div className="w-full h-full rounded-full bg-[#02241b] flex items-center justify-center overflow-hidden">
-                <span className="text-lg">👨‍💼</span>
+            {/* 3D Orbit Ring (BEHIND SHARK) */}
+            <div className="absolute inset-[-12px] rounded-full border-[3px] border-dashed border-emerald-400/40 animate-spin z-0" style={{ animationDuration: '22s' }} />
+
+            {/* Glowing 3D Laser Ray Orbit (Passes Behind & In Front) */}
+            <div className="absolute w-[220px] h-[75px] rounded-[100%] border-[4px] border-emerald-400/80 shadow-[0_0_25px_rgba(52,211,153,0.8)] transform -rotate-12 z-0 animate-pulse" />
+            
+            {/* Floating Parallax Icon 1: Shield (Top Left) */}
+            <div className="absolute -top-1 -left-2 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '3.5s' }}>
+              <Shield className="w-4 h-4" />
+            </div>
+
+            {/* Floating Parallax Icon 2: Dollar (Top Right) */}
+            <div className="absolute top-2 -right-2 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }}>
+              <DollarSign className="w-4 h-4" />
+            </div>
+
+            {/* Floating Parallax Icon 3: Lightning / Raio Verde (Bottom Left) */}
+            <div className="absolute bottom-2 -left-3 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '3.2s', animationDelay: '1s' }}>
+              <Zap className="w-4 h-4 text-emerald-300 fill-emerald-300" />
+            </div>
+
+            {/* Floating Parallax Icon 4: Trending Up (Bottom Right) */}
+            <div className="absolute bottom-3 -right-2 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '3.8s', animationDelay: '0.8s' }}>
+              <TrendingUp className="w-4 h-4" />
+            </div>
+
+            {/* MAIN SHARK AVATAR (LARGER SIZE) */}
+            <div className="w-38 h-38 sm:w-42 sm:h-42 rounded-full p-[3px] bg-gradient-to-tr from-emerald-400 via-emerald-300 to-teal-500 shadow-[0_0_30px_rgba(16,185,129,0.5)] z-10 transform hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full rounded-full bg-[#021f17] overflow-hidden relative flex items-center justify-center">
+                <Image
+                  src="/shark-avatar.png"
+                  alt="Shark System Logo"
+                  width={180}
+                  height={180}
+                  className="object-cover w-full h-full transform scale-110"
+                  priority
+                />
               </div>
             </div>
 
-            {/* Avatar Top Right */}
-            <div className="absolute top-1 right-3 w-13 h-13 rounded-full bg-[#064e3b] p-[2px] shadow-lg border border-emerald-400/30 transform rotate-6">
-              <div className="w-full h-full rounded-full bg-[#02241b] flex items-center justify-center overflow-hidden">
-                <span className="text-lg">👩‍💻</span>
-              </div>
-            </div>
-
-            {/* Avatar Bottom Center */}
-            <div className="absolute bottom-0 w-15 h-15 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-700 p-[2px] shadow-xl z-10">
-              <div className="w-full h-full rounded-full bg-[#03241b] flex items-center justify-center overflow-hidden">
-                <Shield className="w-6 h-6 text-emerald-300" />
-              </div>
-            </div>
+            {/* Glowing Front 3D Orbit Arc Overlay (Passes IN FRONT of Shark) */}
+            <div className="absolute w-[220px] h-[75px] rounded-[100%] border-t-[4px] border-r-[4px] border-emerald-300 shadow-[0_0_20px_rgba(52,211,153,0.9)] transform -rotate-12 z-20 pointer-events-none" />
 
             {/* Floating Glass Pill Badge: Shark System */}
-            <div className="absolute top-7 z-20 px-3 py-0.5 rounded-full bg-[#064e3b]/95 backdrop-blur-md border border-emerald-400/50 text-white font-extrabold text-[10px] shadow-md tracking-wider">
-              Shark System
+            <div className="absolute -bottom-3 z-30 px-4 py-1 rounded-full bg-[#064e3b] backdrop-blur-md border border-emerald-400/70 text-white font-extrabold text-[11px] shadow-xl tracking-wider flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-emerald-300 fill-emerald-300" />
+              <span>Shark System</span>
             </div>
           </div>
 
           {/* Top Brand Tag (Acima do texto grande) */}
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 mb-1.5 shrink-0">
+          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 mb-1 mt-2 shrink-0">
             <Sparkles className="w-3 h-3 text-emerald-400" />
             <span className="text-[10px] font-extrabold text-emerald-300 tracking-[0.2em] uppercase">
               SHARK SYSTEM
@@ -112,18 +137,18 @@ export default function LoginPage() {
           </h1>
           
           {/* Subtitle */}
-          <p className="text-[11px] text-emerald-200/70 font-medium text-center mt-1 max-w-[230px] shrink-0">
+          <p className="text-[11px] text-emerald-200/70 font-medium text-center mt-0.5 max-w-[230px] shrink-0">
             Acesse o painel para gerenciar suas operações financeiras
           </p>
         </div>
 
         {/* Bottom Curved White Form Card */}
-        <div className="w-full bg-white text-slate-900 rounded-t-[34px] pt-5 px-6 pb-4 shadow-2xl relative z-20 shrink-0 flex flex-col justify-between">
+        <div className="w-full bg-white text-slate-900 rounded-t-[34px] pt-4 px-6 pb-4 shadow-2xl relative z-30 shrink-0 flex flex-col justify-between">
           
-          <form onSubmit={handleLogin} className="space-y-3">
+          <form onSubmit={handleLogin} className="space-y-2.5">
             
             {/* Subtitle & Prompt */}
-            <div className="text-center space-y-0.5 mb-2">
+            <div className="text-center space-y-0.5 mb-1">
               <p className="text-[10px] text-slate-400 font-medium">
                 Você já possui uma conta de acesso?
               </p>
@@ -134,7 +159,7 @@ export default function LoginPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold text-center">
+              <div className="p-2 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold text-center">
                 {error}
               </div>
             )}
@@ -187,7 +212,7 @@ export default function LoginPage() {
             </div>
 
             {/* Clean Curved Bottom Action Button */}
-            <div className="pt-2 pb-0.5 flex justify-center">
+            <div className="pt-1.5 pb-0.5 flex justify-center">
               <button
                 type="submit"
                 disabled={isLoading}
@@ -210,7 +235,7 @@ export default function LoginPage() {
           </form>
 
           {/* Footer note */}
-          <p className="text-center text-[9px] font-semibold text-slate-400 pt-3 pb-0.5">
+          <p className="text-center text-[9px] font-semibold text-slate-400 pt-2 pb-0.5">
             Shark System &copy; {new Date().getFullYear()} • Todos os direitos reservados
           </p>
 
