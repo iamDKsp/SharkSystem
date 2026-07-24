@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp } from "lucide-react";
-import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -43,7 +42,6 @@ export default function LoginPage() {
     <div className="min-h-screen w-full bg-[#021812] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
       {/* Dynamic Background Ambient Glows */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[520px] h-[520px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-teal-600/10 rounded-full blur-[100px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
       <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#03241b] sm:rounded-[44px] shadow-2xl shadow-black/80 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
@@ -55,7 +53,7 @@ export default function LoginPage() {
         <div className="absolute top-[280px] right-6 w-4 h-4 rounded-full bg-emerald-400/20 blur-[0.5px]" />
 
         {/* Top Mobile Bar Header */}
-        <div className="pt-3 px-6 flex items-center justify-between z-30 text-emerald-100/90 text-xs font-semibold tracking-tight shrink-0">
+        <div className="pt-3.5 px-6 flex items-center justify-between z-30 text-emerald-100/90 text-xs font-semibold tracking-tight shrink-0">
           <span>9:41</span>
           {/* Dynamic Island Notch */}
           <div className="w-24 h-4.5 bg-[#01140e] rounded-full flex items-center justify-end px-2.5 gap-1.5 border border-emerald-900/40 shadow-inner">
@@ -71,62 +69,54 @@ export default function LoginPage() {
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-10 relative">
           
           {/* 3D PARALLAX SHARK AVATAR CONTAINER */}
-          <div className="relative w-48 h-48 sm:w-52 sm:h-52 my-1 flex items-center justify-center shrink-0 perspective-1000">
+          <div className="relative w-44 h-44 sm:w-48 sm:h-48 my-1 flex items-center justify-center shrink-0">
             
-            {/* 3D Orbit Ring (BEHIND SHARK) */}
-            <div className="absolute inset-[-12px] rounded-full border-[3px] border-dashed border-emerald-400/40 animate-spin z-0" style={{ animationDuration: '22s' }} />
+            {/* Dashed outer orbit ring */}
+            <div className="absolute inset-[-8px] rounded-full border-[2px] border-dashed border-emerald-400/30 animate-spin z-0" style={{ animationDuration: '24s' }} />
 
-            {/* Glowing 3D Laser Ray Orbit (Passes Behind & In Front) */}
-            <div className="absolute w-[220px] h-[75px] rounded-[100%] border-[4px] border-emerald-400/80 shadow-[0_0_25px_rgba(52,211,153,0.8)] transform -rotate-12 z-0 animate-pulse" />
+            {/* Glowing 3D Laser Ray Ring (Behind Avatar) */}
+            <div className="absolute w-[200px] h-[65px] rounded-[100%] border-[3px] border-emerald-400/80 shadow-[0_0_20px_rgba(52,211,153,0.7)] transform -rotate-12 z-0 animate-pulse" />
             
             {/* Floating Parallax Icon 1: Shield (Top Left) */}
-            <div className="absolute -top-1 -left-2 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '3.5s' }}>
+            <div className="absolute top-0 left-0 z-20 p-2 rounded-2xl bg-[#064e3b] border border-emerald-400/50 shadow-lg text-emerald-300 animate-bounce" style={{ animationDuration: '3.5s' }}>
               <Shield className="w-4 h-4" />
             </div>
 
             {/* Floating Parallax Icon 2: Dollar (Top Right) */}
-            <div className="absolute top-2 -right-2 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }}>
+            <div className="absolute top-1 right-0 z-20 p-2 rounded-2xl bg-[#064e3b] border border-emerald-400/50 shadow-lg text-emerald-300 animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }}>
               <DollarSign className="w-4 h-4" />
             </div>
 
-            {/* Floating Parallax Icon 3: Lightning / Raio Verde (Bottom Left) */}
-            <div className="absolute bottom-2 -left-3 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '3.2s', animationDelay: '1s' }}>
+            {/* Floating Parallax Icon 3: Lightning (Bottom Left) */}
+            <div className="absolute bottom-1 left-0 z-20 p-2 rounded-2xl bg-[#064e3b] border border-emerald-400/50 shadow-lg text-emerald-300 animate-bounce" style={{ animationDuration: '3.2s', animationDelay: '1s' }}>
               <Zap className="w-4 h-4 text-emerald-300 fill-emerald-300" />
             </div>
 
             {/* Floating Parallax Icon 4: Trending Up (Bottom Right) */}
-            <div className="absolute bottom-3 -right-2 z-20 p-2 rounded-2xl bg-[#064e3b]/90 backdrop-blur-md border border-emerald-400/60 shadow-lg shadow-emerald-950/50 text-emerald-300 animate-bounce" style={{ animationDuration: '3.8s', animationDelay: '0.8s' }}>
+            <div className="absolute bottom-2 right-0 z-20 p-2 rounded-2xl bg-[#064e3b] border border-emerald-400/50 shadow-lg text-emerald-300 animate-bounce" style={{ animationDuration: '3.8s', animationDelay: '0.8s' }}>
               <TrendingUp className="w-4 h-4" />
             </div>
 
-            {/* MAIN SHARK AVATAR (LARGER SIZE) */}
-            <div className="w-38 h-38 sm:w-42 sm:h-42 rounded-full p-[3px] bg-gradient-to-tr from-emerald-400 via-emerald-300 to-teal-500 shadow-[0_0_30px_rgba(16,185,129,0.5)] z-10 transform hover:scale-105 transition-transform duration-300">
-              <div className="w-full h-full rounded-full bg-[#021f17] overflow-hidden relative flex items-center justify-center">
-                <Image
+            {/* MAIN SHARK AVATAR (GIGANTE E VISÍVEL) */}
+            <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-[3px] bg-gradient-to-tr from-emerald-400 via-emerald-300 to-teal-500 shadow-[0_0_25px_rgba(16,185,129,0.6)] z-10 overflow-hidden relative flex items-center justify-center">
+              <div className="w-full h-full rounded-full bg-[#021f17] overflow-hidden flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src="/shark-avatar.png"
-                  alt="Shark System Logo"
-                  width={180}
-                  height={180}
-                  className="object-cover w-full h-full transform scale-110"
-                  priority
+                  alt="Shark System Avatar"
+                  className="w-full h-full object-cover object-center transform scale-110"
                 />
               </div>
             </div>
 
-            {/* Glowing Front 3D Orbit Arc Overlay (Passes IN FRONT of Shark) */}
-            <div className="absolute w-[220px] h-[75px] rounded-[100%] border-t-[4px] border-r-[4px] border-emerald-300 shadow-[0_0_20px_rgba(52,211,153,0.9)] transform -rotate-12 z-20 pointer-events-none" />
-
-            {/* Floating Glass Pill Badge: Shark System */}
-            <div className="absolute -bottom-3 z-30 px-4 py-1 rounded-full bg-[#064e3b] backdrop-blur-md border border-emerald-400/70 text-white font-extrabold text-[11px] shadow-xl tracking-wider flex items-center gap-1.5">
-              <Zap className="w-3 h-3 text-emerald-300 fill-emerald-300" />
-              <span>Shark System</span>
-            </div>
+            {/* Front Glowing Ring Arc (In front of Avatar) */}
+            <div className="absolute w-[200px] h-[65px] rounded-[100%] border-t-[3px] border-r-[3px] border-emerald-300 shadow-[0_0_15px_rgba(52,211,153,0.9)] transform -rotate-12 z-20 pointer-events-none" />
           </div>
 
-          {/* Top Brand Tag (Acima do texto grande) */}
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-950/60 border border-emerald-500/30 mb-1 mt-2 shrink-0">
-            <Sparkles className="w-3 h-3 text-emerald-400" />
-            <span className="text-[10px] font-extrabold text-emerald-300 tracking-[0.2em] uppercase">
+          {/* Top Brand Badge */}
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 mb-1.5 mt-2 shrink-0 shadow-md">
+            <Zap className="w-3.5 h-3.5 text-emerald-300 fill-emerald-300" />
+            <span className="text-[11px] font-extrabold text-white tracking-[0.2em] uppercase">
               SHARK SYSTEM
             </span>
           </div>
