@@ -66,7 +66,7 @@ export default function LoginPage() {
       <div className="flex-1 flex flex-col items-center justify-end pb-2 px-4 z-10 relative min-h-0">
         {/* Tubarão — escala reduzida no mobile para caber tudo */}
         <div className="w-full flex items-center justify-center"
-          style={{ maxHeight: "46vh" }}
+          style={{ maxHeight: "52vh" }}
         >
           <SharkHero compact />
         </div>
@@ -122,7 +122,8 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Seu e-mail de acesso"
-              className="w-full bg-transparent text-slate-900 text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400"
+              style={{ fontSize: '16px' }}
               required
               autoComplete="email"
             />
@@ -136,7 +137,8 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Sua senha"
-              className="w-full bg-transparent text-slate-900 text-sm font-semibold focus:outline-none placeholder:text-slate-400"
+              className="w-full bg-transparent text-slate-900 font-semibold focus:outline-none placeholder:text-slate-400"
+              style={{ fontSize: '16px' }}
               required
               autoComplete="current-password"
             />

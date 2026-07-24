@@ -98,7 +98,7 @@ export function SharkHero({ compact = false }: { compact?: boolean }) {
   );
 
   return (
-    <div className={`relative mx-auto flex w-full max-w-[380px] items-center justify-center [perspective:1000px] select-none pointer-events-none origin-center ${compact ? "h-[160px] scale-[0.72]" : "h-[190px] sm:h-[270px] scale-[0.78] sm:scale-100"}`}>
+    <div className={`relative mx-auto flex w-full max-w-[380px] items-center justify-center [perspective:1000px] select-none pointer-events-none origin-center ${compact ? "h-[210px] scale-[0.88]" : "h-[190px] sm:h-[270px] scale-[0.78] sm:scale-100"}`}>
       {/* CSS das animações e keyframes originais de lux-orbit-zen */}
       <style jsx global>{`
         @keyframes shark-breathe-zen {
