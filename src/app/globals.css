@@ -52,11 +52,6 @@ body {
   min-height: 100vh;
 }
 
-/* Esconder indicador dev do Next.js (ícone N no canto inferior) */
-nextjs-portal, [data-nextjs-toast], [data-nextjs-toast-wrapper], [data-nextjs-dialog-overlay] {
-  display: none !important;
-}
-
 /* Custom premium scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

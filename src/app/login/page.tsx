@@ -39,12 +39,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="h-screen h-[100dvh] w-full bg-[#021812] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden fixed inset-0">
+    <div className="min-h-screen w-full bg-[#021812] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
       {/* Background ambient glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
-      <div className="w-full max-w-[390px] h-full max-h-[100dvh] sm:h-[810px] sm:max-h-[92vh] bg-[#03241b] sm:rounded-[44px] shadow-2xl shadow-black/80 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
+      <div className="w-full max-w-[390px] h-screen sm:h-[780px] bg-[#03241b] sm:rounded-[44px] shadow-2xl shadow-black/80 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
         
         {/* Ambient Decorative Dots */}
         <div className="absolute top-14 left-6 w-4 h-4 rounded-full bg-emerald-500/15 blur-[1px]" />
@@ -66,7 +66,7 @@ export default function LoginPage() {
         </div>
 
         {/* Top Header Section (Avatars & Refined Typographic Titles) */}
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-2 z-10 relative overflow-hidden">
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-2 z-10 relative">
           
           {/* 3D Avatars Cluster */}
           <div className="relative w-44 h-28 mb-3 flex items-center justify-center shrink-0">
