@@ -14,26 +14,36 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 3D Parallax Tilt State
+  // 3D Parallax Tilt State (Mobile Touch & Mouse Friendly)
   const containerRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ rx: 0, ry: 0, tx: 0, ty: 0 });
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+  const calculateTilt = (clientX: number, clientY: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left - rect.width / 2;
-    const y = e.clientY - rect.top - rect.height / 2;
+    const x = clientX - rect.left - rect.width / 2;
+    const y = clientY - rect.top - rect.height / 2;
     
-    // Rotation tilt values for 3D camera effect
-    const rx = -(y / (rect.height / 2)) * 14;
-    const ry = (x / (rect.width / 2)) * 14;
-    const tx = (x / (rect.width / 2)) * 10;
-    const ty = (y / (rect.height / 2)) * 10;
+    // Smooth Mobile-optimized rotation angles (max 12deg for mobile feel)
+    const rx = -(y / (rect.height / 2)) * 12;
+    const ry = (x / (rect.width / 2)) * 12;
+    const tx = (x / (rect.width / 2)) * 8;
+    const ty = (y / (rect.height / 2)) * 8;
 
     setTilt({ rx, ry, tx, ty });
   };
 
-  const handleMouseLeave = () => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    calculateTilt(e.clientX, e.clientY);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (e.touches.length > 0) {
+      calculateTilt(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  };
+
+  const handleResetTilt = () => {
     setTilt({ rx: 0, ry: 0, tx: 0, ty: 0 });
   };
 
@@ -64,10 +74,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#01140e] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
+    <div className="min-h-screen w-full bg-[#01140e] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden touch-none">
       {/* Ambient Radial Lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/15 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[350px] h-[350px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
       <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#021f17] sm:rounded-[44px] shadow-2xl shadow-black/90 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
@@ -89,17 +99,19 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* TOP HERO SECTION: 3D POP-OUT SMARTPHONE DISPLAY EFFECT */}
+        {/* TOP HERO SECTION: MOBILE-FIRST 3D POP-OUT HERO */}
         <div 
           ref={containerRef}
           onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-          className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-20 relative cursor-pointer"
-          style={{ perspective: "1200px" }}
+          onMouseLeave={handleResetTilt}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleResetTilt}
+          className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-20 relative cursor-grab active:cursor-grabbing"
+          style={{ perspective: "1000px" }}
         >
           {/* 3D SCENE ROOT CONTAINER */}
           <div 
-            className="relative w-full h-[270px] my-1 flex items-center justify-center shrink-0 transition-transform duration-200 ease-out"
+            className="relative w-full h-[260px] my-1 flex items-center justify-center shrink-0 transition-transform duration-150 ease-out will-change-transform"
             style={{
               transformStyle: "preserve-3d",
               transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`
@@ -107,78 +119,72 @@ export default function LoginPage() {
           >
             {/* LAYER -2: 3D Floor Shadow */}
             <div 
-              className="absolute bottom-2 w-48 h-8 rounded-full bg-black/60 blur-[12px]" 
-              style={{ transform: `translateZ(-40px) scaleY(0.4)` }}
+              className="absolute bottom-1 w-48 h-7 rounded-full bg-black/70 blur-[10px]" 
+              style={{ transform: `translateZ(-30px) scaleY(0.4)` }}
             />
 
             {/* LAYER -1: 3D Inner Screen Frame Glow */}
             <div 
-              className="absolute w-[180px] h-[220px] rounded-[32px] bg-gradient-to-b from-[#064e3b]/40 to-transparent border border-emerald-500/30 shadow-inner"
+              className="absolute w-[180px] h-[210px] rounded-[32px] bg-gradient-to-b from-[#064e3b]/40 to-transparent border border-emerald-500/30 shadow-inner"
               style={{ transform: `translateZ(-20px)` }}
             />
 
-            {/* LAYER 0: 3D Laser Green Orbit Ring (Passing Behind Tubarão) */}
+            {/* LAYER 0: 3D Laser Green Orbit Ring (Apenas por TRÁS do Tubarão - sem tampá-lo) */}
             <div 
-              className="absolute w-[260px] h-[85px] rounded-[100%] border-[4px] border-emerald-400/80 shadow-[0_0_35px_rgba(52,211,153,0.8)] animate-pulse"
-              style={{ transform: `translateZ(-10px) rotateX(65deg) rotateZ(-15deg)` }}
+              className="absolute w-[250px] h-[80px] rounded-[100%] border-[3.5px] border-emerald-400/70 shadow-[0_0_30px_rgba(52,211,153,0.7)] animate-pulse"
+              style={{ transform: `translateZ(-15px) rotateX(65deg) rotateZ(-15deg)` }}
             />
 
-            {/* LAYER 1: TUBARÃO GIGANTE EM 3D POP-OUT (SAINDO DA TELA) */}
+            {/* LAYER 1: TUBARÃO GIGANTE TOTALMENTE NÍTIDO E SEM NADA TAMPANDO A FRENTE */}
             <div 
-              className="w-56 h-56 sm:w-60 sm:h-60 relative flex items-center justify-center filter drop-shadow-[0_20px_35px_rgba(0,0,0,0.85)] z-20"
-              style={{ transform: `translateZ(55px) translateY(-10px)` }}
+              className="w-56 h-56 sm:w-60 sm:h-60 relative flex items-center justify-center filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.85)] z-20"
+              style={{ transform: `translateZ(45px)` }}
             >
               <Image
                 src={sharkAvatar}
-                alt="Shark System 3D Pop Out"
+                alt="Shark System 3D Hero"
                 placeholder="blur"
-                className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(16,185,129,0.4)] transform scale-125"
+                className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(16,185,129,0.35)] transform scale-120"
                 priority
               />
             </div>
 
-            {/* LAYER 2: FLOATING 3D PARALLAX BADGES & COINS (VOLTANDO EM VOLTA EM 3D) */}
+            {/* LAYER 2: FLOATING 3D PARALLAX BADGES & COINS (Nas laterais, sem cobrir o Tubarão) */}
 
-            {/* Floating 3D Badge 1: Escudo 3D (Top Left) */}
+            {/* Ícone 1: Escudo 3D (Top Left) */}
             <div 
-              className="absolute top-2 left-2 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-emerald-300 flex items-center gap-1.5 transition-transform duration-200"
-              style={{ transform: `translateZ(95px) translate(${tilt.tx * 1.6}px, ${tilt.ty * 1.6}px) rotate(-8deg)` }}
+              className="absolute top-2 left-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-emerald-300 flex items-center gap-1.5 transition-transform duration-150 will-change-transform"
+              style={{ transform: `translateZ(75px) translate(${tilt.tx * 1.4}px, ${tilt.ty * 1.4}px) rotate(-8deg)` }}
             >
               <Shield className="w-5 h-5 text-emerald-300 fill-emerald-300/20" />
             </div>
 
-            {/* Floating 3D Badge 2: Moeda de Ouro 3D (Top Right) */}
+            {/* Ícone 2: Moeda de Ouro 3D (Top Right) */}
             <div 
-              className="absolute top-4 right-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 border-2 border-amber-300 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-white flex items-center gap-1 transition-transform duration-200 animate-bounce"
+              className="absolute top-3 right-0 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 border-2 border-amber-300 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-white flex items-center gap-1 transition-transform duration-150 will-change-transform"
               style={{ 
-                animationDuration: '4s',
-                transform: `translateZ(105px) translate(${tilt.tx * -1.6}px, ${tilt.ty * 1.6}px) rotate(12deg)` 
+                transform: `translateZ(85px) translate(${tilt.tx * -1.4}px, ${tilt.ty * 1.4}px) rotate(12deg)` 
               }}
             >
               <CircleDollarSign className="w-5 h-5 text-amber-200 fill-amber-300/30" />
             </div>
 
-            {/* Floating 3D Badge 3: Raio Verde 3D (Bottom Left) */}
+            {/* Ícone 3: Raio Verde 3D (Bottom Left) */}
             <div 
-              className="absolute bottom-4 left-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-200"
-              style={{ transform: `translateZ(100px) translate(${tilt.tx * 1.8}px, ${tilt.ty * -1.6}px) rotate(10deg)` }}
+              className="absolute bottom-4 left-0 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-150 will-change-transform"
+              style={{ transform: `translateZ(80px) translate(${tilt.tx * 1.5}px, ${tilt.ty * -1.4}px) rotate(10deg)` }}
             >
               <Zap className="w-5 h-5 text-emerald-300 fill-emerald-300" />
             </div>
 
-            {/* Floating 3D Badge 4: Cifrão 3D (Bottom Right) */}
+            {/* Ícone 4: Cifrão 3D (Bottom Right) */}
             <div 
-              className="absolute bottom-5 right-2 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_12px_25px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-200"
-              style={{ transform: `translateZ(90px) translate(${tilt.tx * -1.8}px, ${tilt.ty * -1.6}px) rotate(-10deg)` }}
+              className="absolute bottom-5 right-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-150 will-change-transform"
+              style={{ transform: `translateZ(75px) translate(${tilt.tx * -1.5}px, ${tilt.ty * -1.4}px) rotate(-10deg)` }}
             >
               <TrendingUp className="w-5 h-5 text-emerald-300" />
             </div>
 
-            {/* LAYER 3: Laser Front Arc Overlay (Passando na Frente do Tubarão) */}
-            <div 
-              className="absolute w-[260px] h-[85px] rounded-[100%] border-t-[4px] border-emerald-300 shadow-[0_0_25px_rgba(52,211,153,1)] transform -rotate-12 pointer-events-none z-30"
-              style={{ transform: `translateZ(70px) rotateX(65deg) rotateZ(-15deg)` }}
-            />
           </div>
 
           {/* Top Brand Tag */}
