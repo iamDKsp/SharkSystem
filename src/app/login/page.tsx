@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp, CircleDollarSign } from "lucide-react";
 import Image from "next/image";
@@ -13,39 +13,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
-  // 3D Parallax Tilt State (Mobile Touch & Mouse Friendly)
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0, tx: 0, ty: 0 });
-
-  const calculateTilt = (clientX: number, clientY: number) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = clientX - rect.left - rect.width / 2;
-    const y = clientY - rect.top - rect.height / 2;
-    
-    // Smooth Mobile-optimized rotation angles (max 12deg for mobile feel)
-    const rx = -(y / (rect.height / 2)) * 12;
-    const ry = (x / (rect.width / 2)) * 12;
-    const tx = (x / (rect.width / 2)) * 8;
-    const ty = (y / (rect.height / 2)) * 8;
-
-    setTilt({ rx, ry, tx, ty });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    calculateTilt(e.clientX, e.clientY);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
-    if (e.touches.length > 0) {
-      calculateTilt(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  };
-
-  const handleResetTilt = () => {
-    setTilt({ rx: 0, ry: 0, tx: 0, ty: 0 });
-  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,17 +41,52 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-[#01140e] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden touch-none">
-      {/* Ambient Radial Lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-10 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
+    <div className="min-h-screen w-full bg-[#01140e] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden">
+      {/* Ambient Radial Glow */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[130px] pointer-events-none" />
+
+      {/* CSS para Animações Suaves e Contínuas com Aceleração de Hardware */}
+      <style jsx global>{`
+        @keyframes float-shield {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(6px, -10px) scale(1.03); }
+          66% { transform: translate(-6px, 4px) scale(0.97); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        @keyframes float-dollar {
+          0% { transform: translate(0px, 0px) scale(1); }
+          25% { transform: translate(-8px, 6px) scale(0.96); }
+          75% { transform: translate(8px, -8px) scale(1.04); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        @keyframes float-zap {
+          0% { transform: translate(0px, 0px) scale(1); }
+          50% { transform: translate(10px, -6px) scale(1.05); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        @keyframes float-trend {
+          0% { transform: translate(0px, 0px) scale(1); }
+          40% { transform: translate(-5px, -8px) scale(1.03); }
+          80% { transform: translate(6px, 6px) scale(0.97); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        @keyframes shark-breathe {
+          0%, 100% { transform: scale(1.15) translateY(0px); }
+          50% { transform: scale(1.17) translateY(-3px); }
+        }
+        .anim-shield { animation: float-shield 7s ease-in-out infinite; will-change: transform; }
+        .anim-dollar { animation: float-dollar 8s ease-in-out infinite; will-change: transform; }
+        .anim-zap { animation: float-zap 6s ease-in-out infinite; will-change: transform; }
+        .anim-trend { animation: float-trend 9s ease-in-out infinite; will-change: transform; }
+        .anim-shark { animation: shark-breathe 5s ease-in-out infinite; will-change: transform; }
+      `}</style>
 
       {/* Main Mobile Frame Container */}
       <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#021f17] sm:rounded-[44px] shadow-2xl shadow-black/90 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
         
         {/* Ambient Decorative Orbs */}
-        <div className="absolute top-14 left-6 w-4 h-4 rounded-full bg-emerald-500/20 blur-[1px] animate-pulse" />
-        <div className="absolute top-24 right-7 w-5 h-5 rounded-full bg-emerald-400/25 blur-[1px]" />
+        <div className="absolute top-14 left-6 w-4 h-4 rounded-full bg-emerald-500/10 blur-[2px] animate-pulse" />
+        <div className="absolute top-24 right-7 w-5 h-5 rounded-full bg-emerald-400/15 blur-[2px]" />
 
         {/* Top Mobile Bar Header */}
         <div className="pt-3.5 px-6 flex items-center justify-between z-40 text-emerald-100/90 text-xs font-semibold tracking-tight shrink-0">
@@ -99,96 +101,49 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* TOP HERO SECTION: MOBILE-FIRST 3D POP-OUT HERO */}
-        <div 
-          ref={containerRef}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleResetTilt}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleResetTilt}
-          className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-20 relative cursor-grab active:cursor-grabbing"
-          style={{ perspective: "1000px" }}
-        >
-          {/* 3D SCENE ROOT CONTAINER */}
-          <div 
-            className="relative w-full h-[260px] my-1 flex items-center justify-center shrink-0 transition-transform duration-150 ease-out will-change-transform"
-            style={{
-              transformStyle: "preserve-3d",
-              transform: `rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`
-            }}
-          >
-            {/* LAYER -2: 3D Floor Shadow */}
-            <div 
-              className="absolute bottom-1 w-48 h-7 rounded-full bg-black/70 blur-[10px]" 
-              style={{ transform: `translateZ(-30px) scaleY(0.4)` }}
-            />
-
-            {/* LAYER -1: 3D Inner Screen Frame Glow */}
-            <div 
-              className="absolute w-[180px] h-[210px] rounded-[32px] bg-gradient-to-b from-[#064e3b]/40 to-transparent border border-emerald-500/30 shadow-inner"
-              style={{ transform: `translateZ(-20px)` }}
-            />
-
-            {/* LAYER 0: 3D Laser Green Orbit Ring (Apenas por TRÁS do Tubarão - sem tampá-lo) */}
-            <div 
-              className="absolute w-[250px] h-[80px] rounded-[100%] border-[3.5px] border-emerald-400/70 shadow-[0_0_30px_rgba(52,211,153,0.7)] animate-pulse"
-              style={{ transform: `translateZ(-15px) rotateX(65deg) rotateZ(-15deg)` }}
-            />
-
-            {/* LAYER 1: TUBARÃO GIGANTE TOTALMENTE NÍTIDO E SEM NADA TAMPANDO A FRENTE */}
-            <div 
-              className="w-56 h-56 sm:w-60 sm:h-60 relative flex items-center justify-center filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.85)] z-20"
-              style={{ transform: `translateZ(45px)` }}
-            >
+        {/* TOP HERO SECTION: CLEAN CONSTANT SMOOTH ANIMATION */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-20 relative">
+          
+          {/* AVATAR HERO WINDOW */}
+          <div className="relative w-48 h-48 sm:w-52 sm:h-52 my-1 flex items-center justify-center shrink-0">
+            
+            {/* TUBARÃO GIGANTE - SEM CORTES - ANIMAÇÃO SUAVE DE RESPIRAÇÃO */}
+            <div className="w-44 h-44 sm:w-48 sm:h-48 relative flex items-center justify-center z-10 anim-shark">
               <Image
                 src={sharkAvatar}
                 alt="Shark System 3D Hero"
                 placeholder="blur"
-                className="w-full h-full object-contain filter drop-shadow-[0_10px_20px_rgba(16,185,129,0.35)] transform scale-120"
+                className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(16,185,129,0.25)]"
                 priority
               />
             </div>
 
-            {/* LAYER 2: FLOATING 3D PARALLAX BADGES & COINS (Nas laterais, sem cobrir o Tubarão) */}
+            {/* FLOATING 3D ICONS - MAIORES, COM BACKDROP BLUR E MOVIMENTOS INDEPENDENTES */}
 
-            {/* Ícone 1: Escudo 3D (Top Left) */}
-            <div 
-              className="absolute top-2 left-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-emerald-300 flex items-center gap-1.5 transition-transform duration-150 will-change-transform"
-              style={{ transform: `translateZ(75px) translate(${tilt.tx * 1.4}px, ${tilt.ty * 1.4}px) rotate(-8deg)` }}
-            >
-              <Shield className="w-5 h-5 text-emerald-300 fill-emerald-300/20" />
+            {/* Ícone 1: Escudo (Top Left) */}
+            <div className="absolute top-0 left-0 z-20 p-2.5 rounded-2xl bg-[#064e3b]/80 backdrop-blur-md border border-emerald-400/40 shadow-lg text-emerald-300 anim-shield">
+              <Shield className="w-5 h-5 text-emerald-300 fill-emerald-300/10" />
             </div>
 
-            {/* Ícone 2: Moeda de Ouro 3D (Top Right) */}
-            <div 
-              className="absolute top-3 right-0 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 border-2 border-amber-300 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-white flex items-center gap-1 transition-transform duration-150 will-change-transform"
-              style={{ 
-                transform: `translateZ(85px) translate(${tilt.tx * -1.4}px, ${tilt.ty * 1.4}px) rotate(12deg)` 
-              }}
-            >
-              <CircleDollarSign className="w-5 h-5 text-amber-200 fill-amber-300/30" />
+            {/* Ícone 2: Moeda de Ouro (Top Right) */}
+            <div className="absolute top-1 right-0 z-20 p-2.5 rounded-2xl bg-gradient-to-br from-amber-500/80 to-amber-700/80 backdrop-blur-md border border-amber-400/40 shadow-lg text-white anim-dollar">
+              <CircleDollarSign className="w-5 h-5 text-amber-200 fill-amber-300/20" />
             </div>
 
-            {/* Ícone 3: Raio Verde 3D (Bottom Left) */}
-            <div 
-              className="absolute bottom-4 left-0 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-150 will-change-transform"
-              style={{ transform: `translateZ(80px) translate(${tilt.tx * 1.5}px, ${tilt.ty * -1.4}px) rotate(10deg)` }}
-            >
-              <Zap className="w-5 h-5 text-emerald-300 fill-emerald-300" />
+            {/* Ícone 3: Raio Verde (Bottom Left) */}
+            <div className="absolute bottom-2 left-0 z-20 p-2.5 rounded-2xl bg-[#064e3b]/80 backdrop-blur-md border border-emerald-400/40 shadow-lg text-emerald-300 anim-zap">
+              <Zap className="w-5 h-5 text-emerald-300 fill-emerald-300/20" />
             </div>
 
-            {/* Ícone 4: Cifrão 3D (Bottom Right) */}
-            <div 
-              className="absolute bottom-5 right-1 z-30 p-2.5 rounded-2xl bg-gradient-to-br from-[#064e3b] to-[#02241b] border-2 border-emerald-400 shadow-[0_10px_20px_rgba(0,0,0,0.6)] text-emerald-300 transition-transform duration-150 will-change-transform"
-              style={{ transform: `translateZ(75px) translate(${tilt.tx * -1.5}px, ${tilt.ty * -1.4}px) rotate(-10deg)` }}
-            >
+            {/* Ícone 4: Cifrão / Tendência (Bottom Right) */}
+            <div className="absolute bottom-3 right-0 z-20 p-2.5 rounded-2xl bg-[#064e3b]/80 backdrop-blur-md border border-emerald-400/40 shadow-lg text-emerald-300 anim-trend">
               <TrendingUp className="w-5 h-5 text-emerald-300" />
             </div>
 
           </div>
 
           {/* Top Brand Tag */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 mb-1 mt-1 shrink-0 shadow-lg z-30">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 mb-1.5 mt-2 shrink-0 shadow-lg z-30">
             <Zap className="w-3.5 h-3.5 text-emerald-300 fill-emerald-300" />
             <span className="text-[11px] font-extrabold text-white tracking-[0.2em] uppercase">
               SHARK SYSTEM
