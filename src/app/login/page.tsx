@@ -2,16 +2,28 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp, CircleDollarSign } from "lucide-react";
+import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, Zap, TrendingUp, CircleDollarSign } from "lucide-react";
 import Image from "next/image";
 import sharkAvatar from "./shark-avatar.png";
 
 interface OrbitingIcon {
   id: number;
   component: React.ReactNode;
-  phase: number; // Radianos iniciais
-  speedMult: number; // Multiplicador de velocidade ligeiramente diferente
-  zOffset: number; // Altura Z individual (parallax 3D)
+  initialPhase: number;
+  period: number; // Período orbital em segundos
+  floatPhaseOffset: number; // Offset para a flutuação vertical
+  colorTheme: "emerald" | "amber";
+}
+
+interface BackgroundParticle {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  speedX: number;
+  speedY: number;
+  opacity: number;
+  depth: number; // Fator de profundidade (0 a 1) para efeito de parallax
 }
 
 export default function LoginPage() {
@@ -22,42 +34,45 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Estados de animação controlados via JS para suavidade AAA 60FPS
+  // Time state updated via requestAnimationFrame at 60fps for ultra-smooth rendering
   const [time, setTime] = useState(0);
 
   // Background Particles
-  const [particles, setParticles] = useState<{ id: number; x: number; y: number; scale: number; speedX: number; speedY: number; opacity: number }[]>([]);
+  const [particles, setParticles] = useState<BackgroundParticle[]>([]);
 
   useEffect(() => {
-    // Inicializar partículas com posições aleatórias
-    const initialParticles = Array.from({ length: 8 }).map((_, i) => ({
-      id: i,
-      x: Math.random() * 320,
-      y: Math.random() * 320,
-      scale: 0.6 + Math.random() * 1.4,
-      speedX: (Math.random() - 0.5) * 0.15,
-      speedY: (Math.random() - 0.5) * 0.15,
-      opacity: 0.1 + Math.random() * 0.2,
-    }));
+    // Inicializar partículas com diferentes profundidades, tamanhos e opacidades
+    const initialParticles = Array.from({ length: 12 }).map((_, i) => {
+      const depth = Math.random(); // 0 (distante) a 1 (próximo)
+      return {
+        id: i,
+        x: Math.random() * 340,
+        y: Math.random() * 260,
+        size: 2 + depth * 5, // Partículas mais próximas são maiores
+        speedX: (Math.random() - 0.5) * 0.08 * (0.5 + depth),
+        speedY: (Math.random() - 0.5) * 0.08 * (0.5 + depth),
+        opacity: 0.05 + depth * 0.25, // Partículas mais próximas são mais visíveis
+        depth
+      };
+    });
     setParticles(initialParticles);
 
-    // Loop de renderização 60FPS
     let animationFrameId: number;
     let startTime = performance.now();
 
     const updateFrame = (now: number) => {
-      const elapsed = (now - startTime) / 1000; // Segundos
+      const elapsed = (now - startTime) / 1000;
       setTime(elapsed);
 
-      // Atualizar partículas com wrapping de borda
+      // Mover partículas de forma suave com wrapping nos limites do container
       setParticles(prev =>
         prev.map(p => {
           let nextX = p.x + p.speedX * 60 * 0.016;
           let nextY = p.y + p.speedY * 60 * 0.016;
-          if (nextX < -50) nextX = 350;
-          if (nextX > 350) nextX = -50;
-          if (nextY < -50) nextY = 350;
-          if (nextY > 350) nextY = -50;
+          if (nextX < -20) nextX = 360;
+          if (nextX > 360) nextX = -20;
+          if (nextY < -20) nextY = 280;
+          if (nextY > 280) nextY = -20;
           return { ...p, x: nextX, y: nextY };
         })
       );
@@ -69,44 +84,58 @@ export default function LoginPage() {
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
-  // Definição dos ícones com fases (offsets) não-sincronizados para evitar alinhamento plano
-  const icons: OrbitingIcon[] = [
+  // Configuração dos 4 ícones orbitais com órbitas matemáticas independentes e não-sincronizadas
+  const orbitingIcons: OrbitingIcon[] = [
     {
       id: 0,
       component: <Shield className="w-5 h-5 text-emerald-300 fill-emerald-300/10" />,
-      phase: 0,
-      speedMult: 1.0,
-      zOffset: 12
+      initialPhase: 0,
+      period: 9.8, // 9.8s para completar a volta
+      floatPhaseOffset: 0.0,
+      colorTheme: "emerald"
     },
     {
       id: 1,
       component: <CircleDollarSign className="w-5 h-5 text-amber-200 fill-amber-300/20" />,
-      phase: Math.PI / 2 + 0.35,
-      speedMult: 0.95,
-      zOffset: -8
+      initialPhase: Math.PI / 2 + 0.4,
+      period: 10.6, // 10.6s
+      floatPhaseOffset: 1.2,
+      colorTheme: "amber"
     },
     {
       id: 2,
-      component: <Zap className="w-5 h-5 text-emerald-300 fill-emerald-300/25" />,
-      phase: Math.PI + 0.15,
-      speedMult: 1.05,
-      zOffset: 5
+      component: <Zap className="w-5 h-5 text-emerald-300 fill-emerald-300/20" />,
+      initialPhase: Math.PI + 0.15,
+      period: 10.1, // 10.1s
+      floatPhaseOffset: 2.4,
+      colorTheme: "emerald"
     },
     {
       id: 3,
       component: <TrendingUp className="w-5 h-5 text-emerald-300" />,
-      phase: (3 * Math.PI) / 2 - 0.25,
-      speedMult: 1.0,
-      zOffset: -12
+      initialPhase: (3 * Math.PI) / 2 - 0.25,
+      period: 11.2, // 11.2s
+      floatPhaseOffset: 3.8,
+      colorTheme: "emerald"
     }
   ];
 
-  // Configuração da Órbita Elíptica Inclinada em 3D
-  const orbitPeriod = 14; // Uma volta completa a cada 14 segundos
-  const orbitSpeed = (2 * Math.PI) / orbitPeriod;
-  const rx = 100; // Raio X (largura)
-  const rz = 75; // Raio Z (profundidade)
-  const tiltAngle = 25 * (Math.PI / 180); // Inclinação de 25 graus da órbita
+  // Geometria da órbita elíptica inclinada 3D
+  const rx = 112; // Raio horizontal X (95px-120px)
+  const rz = 80;  // Raio de profundidade Z
+  const tiltAngle = 25 * (Math.PI / 180); // Inclinação de 25 graus
+
+  // Fórmulas matemáticas do Tubarão (Âncora Visual Estática)
+  // Período de respiração: 4s, Amplitude de flutuação: 3px
+  const sharkY = Math.sin((2 * Math.PI * time) / 4) * 3;
+  
+  // Período de rotação do corpo: 8s, Amplitude: ±2°
+  const sharkRot = Math.cos((2 * Math.PI * time) / 8) * 2;
+  
+  // Reflexo do óculos a cada 6s (sweep horizontal suave de 50ms de transição)
+  const reflectionCycle = time % 6;
+  const showReflection = reflectionCycle < 1.2; // Dura 1.2s a cada 6s
+  const reflectionOffset = showReflection ? (reflectionCycle / 1.2) * 200 - 50 : -50;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,32 +163,27 @@ export default function LoginPage() {
     }
   };
 
-  // Cálculo da Animação do Tubarão (Quase Estático, Respiração AAA)
-  const sharkY = Math.sin(time * 2.2) * 1.8; // Respiração vertical sutil (±1.8px)
-  const sharkRot = Math.cos(time * 1.5) * 1.5; // Rotação sutil (±1.5°)
-  const catchPos = ((time * 60) % 360) * 1.8 - 180; // Movimento do brilho do óculos a cada 6s
-
   return (
     <div className="min-h-screen w-full bg-[#01140e] flex items-center justify-center p-0 sm:p-4 font-sans select-none overflow-hidden relative">
-      {/* Background radial lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/15 rounded-full blur-[150px] pointer-events-none" />
+      {/* Cinematic teal rim lighting & background bloom */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Main Mobile Frame Container */}
       <div className="w-full max-w-[390px] h-screen sm:h-[790px] bg-[#021f17] sm:rounded-[44px] shadow-2xl shadow-black/95 border-0 sm:border-[8px] sm:border-[#064e3b] flex flex-col justify-between relative overflow-hidden">
         
-        {/* Renderização de Partículas de Fundo Flutuantes com Profundidade (Parallax) */}
+        {/* Procedural Blurred Particles Background */}
         {particles.map(p => (
           <div
             key={p.id}
-            className="absolute rounded-full bg-emerald-400/40 pointer-events-none transition-all duration-300"
+            className="absolute rounded-full bg-emerald-400/30 pointer-events-none transition-all duration-300"
             style={{
               left: `${p.x}px`,
               top: `${p.y}px`,
-              width: `${4 * p.scale}px`,
-              height: `${4 * p.scale}px`,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
               opacity: p.opacity,
-              filter: `blur(${Math.max(0.5, (3 - p.scale) * 1.5)}px)`,
-              transform: `translateZ(${p.scale * 10}px)`
+              filter: `blur(${Math.max(0.5, (1 - p.depth) * 4)}px)`,
+              transform: `translateZ(${p.depth * 20}px)`
             }}
           />
         ))}
@@ -177,82 +201,89 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* TOP HERO SECTION: AAA VISION OS ENVIRONMENT */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-1 z-20 relative select-none">
+        {/* TOP HERO SECTION: AAA PLATFORM DISPLAY */}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pt-4 pb-2 z-20 relative select-none">
           
-          {/* 3D SCENE WRAPPER */}
-          <div className="relative w-48 h-48 sm:w-52 sm:h-52 my-2 flex items-center justify-center shrink-0">
+          {/* 3D SCENE WRAPPER CENTERED AROUND SHARK'S CHEST */}
+          <div className="relative w-64 h-64 flex items-center justify-center shrink-0">
             
-            {/* TUBARÃO GIGANTE - VISUAL ANCHOR - ESTÁTICO COM ANIMAÇÃO DE RESPIRAÇÃO */}
+            {/* MAIN SHARK MASCOT (HERO ANCHOR - INCREASED SIZE BY 40% & UNINTERRUPTED FACE) */}
             <div 
-              className="w-40 h-40 sm:w-44 sm:h-44 relative flex items-center justify-center z-10 transition-transform duration-75 will-change-transform"
+              className="w-56 h-56 relative flex items-center justify-center z-10 transition-transform duration-75 will-change-transform"
               style={{ 
                 transform: `translateY(${sharkY}px) rotate(${sharkRot}deg) translateZ(0px)`
               }}
             >
-              {/* Brilho Suave de Borda (Teal Rim Light) */}
-              <div className="absolute inset-2 rounded-full bg-emerald-500/10 blur-[25px] z-0 pointer-events-none" />
+              {/* Soft teal glow highlight underneath */}
+              <div className="absolute inset-4 rounded-full bg-emerald-500/10 blur-[30px] z-0 pointer-events-none" />
 
               <div className="w-full h-full relative overflow-visible flex items-center justify-center">
                 <Image
                   src={sharkAvatar}
-                  alt="Shark System 3D Hero"
+                  alt="Shark Mascot"
                   placeholder="blur"
-                  className="w-full h-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,0,0,0.6)]"
+                  className="w-full h-full object-contain filter drop-shadow-[0_16px_32px_rgba(0,0,0,0.65)]"
                   priority
                 />
 
-                {/* Efeito de Reflexo / Brilho nos Óculos (Sunglasses Catch Reflection) */}
-                <div className="absolute top-[41px] left-[55px] w-[95px] h-[32px] overflow-hidden rounded-md pointer-events-none z-20 opacity-40 mix-blend-overlay">
+                {/* Refined Sunglasses Sweep light reflection */}
+                <div className="absolute top-[48px] left-[65px] w-[105px] h-[34px] overflow-hidden rounded-md pointer-events-none z-20 opacity-30 mix-blend-overlay">
                   <div 
-                    className="w-8 h-[60px] bg-white blur-[2px] transform rotate-30 absolute transition-all duration-75"
+                    className="w-7 h-[70px] bg-white blur-[2px] transform rotate-30 absolute transition-all duration-75"
                     style={{
-                      left: `${((time * 80) % 400) - 100}px`
+                      left: `${reflectionOffset}px`
                     }}
                   />
                 </div>
               </div>
             </div>
 
-            {/* FLOATING 3D ORBITING ICONS WITH DEPTH SORTING */}
-            {icons.map(icon => {
-              // Calcular ângulo de fase com base no tempo
-              const theta = orbitSpeed * time * icon.speedMult + icon.phase;
+            {/* HIGH END 3D ORBIT SYSTEM - MATHEMATICAL DEPTH SORTING */}
+            {orbitingIcons.map(icon => {
+              // Calcular ângulo orbital contínuo a partir do tempo e fase inicial
+              const theta = ((2 * Math.PI) / icon.period) * time + icon.initialPhase;
               
-              // 3D Coords em órbita horizontal
+              // Coordenadas tridimensionais
               const cx = rx * Math.cos(theta);
-              const cz = rz * Math.sin(theta); // Profundidade (Z)
+              const cz = rz * Math.sin(theta); // Profundidade
               
-              // Aplicar rotação de inclinação de 25 graus no eixo X
-              // cy' = cy * cos(tilt) - cz * sin(tilt) = -cz * sin(tilt) (já que cy original é 0)
-              const cy = -cz * Math.sin(tiltAngle) + icon.zOffset;
+              // Inclinação 3D de 25 graus no plano X
+              const cy = -cz * Math.sin(tiltAngle);
               
+              // Flutuação vertical individual (Amplitude: 6px, Período: 3.5s)
+              const yFloat = Math.sin((2 * Math.PI * time) / 3.5 + icon.floatPhaseOffset) * 6;
+              const finalY = cy + yFloat;
+
+              // Rotação individual da tag (±4° com período de 3.5s)
+              const iconRot = Math.cos((2 * Math.PI * time) / 3.5 + icon.floatPhaseOffset) * 4;
+
               // Z' final para Depth Sorting
               const finalZ = cz * Math.cos(tiltAngle);
 
-              // Fatores baseados na profundidade para efeitos realistas (Depth Scaling & Styling)
+              // Depth styling de acordo com o especificado
               const maxZ = rz * Math.cos(tiltAngle);
-              const normDepth = finalZ / maxZ; // Escala de -1 (fundo) a 1 (frente)
+              const normDepth = finalZ / maxZ; // Escala entre -1 (fundo) e 1 (frente)
 
-              // Mapeamentos precisos do Spec
-              const scale = 0.96 + 0.14 * normDepth; // Front 110%, Middle 100%, Back 82%
-              const opacity = 0.875 + 0.125 * normDepth; // Leve atenuação no fundo
-              const blur = Math.max(0, (1 - normDepth) * 1.5); // Fundo desfoca até 3px
-              const shadowOpacity = 0.15 + 0.25 * ((normDepth + 1) / 2); // Sombra mais suave no fundo
-              
-              // Z-Index dinâmico para sobreposição correta do Tubarão (Tubarão é z-index 10)
+              // Mapeamentos exatos de profundidade
+              const scale = 0.975 + 0.175 * normDepth; // 115% na frente, 100% no meio, 80% no fundo
+              const opacity = 0.825 + 0.175 * normDepth; // 100% na frente, 65% no fundo
+              const blur = Math.max(0, (1 - normDepth) * 1.0); // 2px de blur no fundo, 0px na frente
+              const shadowOpacity = 0.15 + 0.3 * ((normDepth + 1) / 2); // Sombra adaptativa de acordo com a proximidade
+
+              // Z-Index dinâmico para garantir que os ícones passem na frente ou atrás do Tubarão
               const zIndex = finalZ > 0 ? 30 : 5;
 
               return (
                 <div
                   key={icon.id}
-                  className="absolute z-20 p-2.5 rounded-2xl border border-emerald-400/40 shadow-lg flex items-center justify-center transition-all duration-75 will-change-transform"
+                  className="absolute p-3 rounded-2xl border flex items-center justify-center transition-all duration-75 will-change-transform"
                   style={{
-                    transform: `translate3d(${cx}px, ${cy}px, ${finalZ}px) scale(${scale})`,
+                    transform: `translate3d(${cx}px, ${finalY}px, ${finalZ}px) scale(${scale}) rotate(${iconRot}deg)`,
                     opacity: opacity,
                     filter: `blur(${blur}px)`,
-                    boxShadow: `0 ${10 * scale}px ${20 * scale}px rgba(0, 0, 0, ${shadowOpacity})`,
-                    backgroundColor: icon.id === 1 ? "rgba(245, 158, 11, 0.8)" : "rgba(6, 78, 59, 0.8)",
+                    boxShadow: `0 ${12 * scale}px ${24 * scale}px rgba(0, 0, 0, ${shadowOpacity})`,
+                    backgroundColor: icon.colorTheme === "amber" ? "rgba(245, 158, 11, 0.8)" : "rgba(6, 78, 59, 0.8)",
+                    borderColor: icon.colorTheme === "amber" ? "rgba(251, 191, 36, 0.4)" : "rgba(52, 211, 153, 0.4)",
                     backdropFilter: "blur(12px)",
                     WebkitBackdropFilter: "blur(12px)",
                     zIndex: zIndex
@@ -265,8 +296,11 @@ export default function LoginPage() {
 
           </div>
 
-          {/* Top Brand Tag */}
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 mb-1.5 mt-2 shrink-0 shadow-lg z-30">
+          {/* Top Brand Tag (Configurado com exatamente 50px de espaçamento do tubarão) */}
+          <div 
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#064e3b] border border-emerald-400/50 shrink-0 shadow-lg z-30"
+            style={{ marginTop: "44px" }} // Garante o espaçamento exato de ~50px da base do mascote
+          >
             <Zap className="w-3.5 h-3.5 text-emerald-300 fill-emerald-300" />
             <span className="text-[11px] font-extrabold text-white tracking-[0.2em] uppercase">
               SHARK SYSTEM
@@ -274,12 +308,12 @@ export default function LoginPage() {
           </div>
 
           {/* Big Main Title: Seja Bem-vindo! */}
-          <h1 className="text-2xl sm:text-3xl font-black text-center text-white tracking-tight leading-tight drop-shadow-md shrink-0 z-30">
+          <h1 className="text-2xl sm:text-3xl font-black text-center text-white tracking-tight leading-none mt-3.5 drop-shadow-md shrink-0 z-30">
             Seja Bem-vindo!
           </h1>
           
           {/* Subtitle */}
-          <p className="text-[11px] text-emerald-200/70 font-medium text-center mt-0.5 max-w-[230px] shrink-0 z-30">
+          <p className="text-[11px] text-emerald-200/70 font-medium text-center mt-1.5 max-w-[230px] shrink-0 z-30">
             Acesse o painel para gerenciar suas operações financeiras
           </p>
         </div>
