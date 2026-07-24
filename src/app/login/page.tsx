@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, Zap, TrendingUp, DollarSign } from "lucide-react";
 import Image from "next/image";
@@ -13,7 +13,7 @@ interface OrbitingIcon {
   period: number;
   floatPhaseOffset: number;
   isGold: boolean;
-  tiltRotation: string; // Inclinação 3D estática para dar o aspecto de bloco 3D
+  tiltRotation: string; // Inclinação 3D para dar o aspecto de bloco 3D
 }
 
 interface OrbitingDot {
@@ -46,11 +46,11 @@ export default function LoginPage() {
     return () => cancelAnimationFrame(animationFrameId);
   }, []);
 
-  // Definição dos blocos 3D de alta fidelidade baseados na imagem
+  // Definição dos blocos 3D de alta fidelidade
   const orbitingIcons: OrbitingIcon[] = [
     {
       id: 0,
-      icon: <Shield className="w-6 h-6 text-[#5af0b9] drop-shadow-[0_0_8px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
+      icon: <Shield className="w-6 h-6 text-[#5af0b9] drop-shadow-[0_0_6px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
       initialPhase: 0,
       period: 11.5,
       floatPhaseOffset: 0.0,
@@ -59,7 +59,7 @@ export default function LoginPage() {
     },
     {
       id: 1,
-      icon: <DollarSign className="w-6 h-6 text-[#ffd56b] drop-shadow-[0_0_8px_rgba(255,213,107,0.6)]" strokeWidth={2.5} />,
+      icon: <DollarSign className="w-6 h-6 text-[#ffd56b] drop-shadow-[0_0_6px_rgba(255,213,107,0.6)]" strokeWidth={2.5} />,
       initialPhase: Math.PI / 2 + 0.4,
       period: 12.5,
       floatPhaseOffset: 1.5,
@@ -68,7 +68,7 @@ export default function LoginPage() {
     },
     {
       id: 2,
-      icon: <Zap className="w-6 h-6 text-[#5af0b9] fill-[#5af0b9]/25 drop-shadow-[0_0_8px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
+      icon: <Zap className="w-6 h-6 text-[#5af0b9] fill-[#5af0b9]/25 drop-shadow-[0_0_6px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
       initialPhase: Math.PI + 0.15,
       period: 11.8,
       floatPhaseOffset: 3.0,
@@ -77,7 +77,7 @@ export default function LoginPage() {
     },
     {
       id: 3,
-      icon: <TrendingUp className="w-6 h-6 text-[#5af0b9] drop-shadow-[0_0_8px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
+      icon: <TrendingUp className="w-6 h-6 text-[#5af0b9] drop-shadow-[0_0_6px_rgba(90,240,185,0.6)]" strokeWidth={2.2} />,
       initialPhase: (3 * Math.PI) / 2 - 0.25,
       period: 12.2,
       floatPhaseOffset: 4.5,
@@ -155,7 +155,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* HERO SECTION: ALTA FIDELIDADE DE ACORDO COM A IMAGEM */}
+        {/* HERO SECTION */}
         <div className="flex-1 flex flex-col items-center justify-center px-4 pt-4 pb-2 z-20 relative select-none">
           
           {/* 3D SCENE ROOT CONTAINER */}
@@ -164,8 +164,11 @@ export default function LoginPage() {
             {/* GLOW DE FUNDO REALÍSTICO (Luz rim teal de trás do mascote) */}
             <div className="absolute w-44 h-44 rounded-full bg-[#10b981]/15 blur-[35px] z-0 pointer-events-none" />
 
-            {/* TRILHO DA ÓRBITA: Fina linha verde neon brilhante com sombra */}
-            <svg className="absolute w-[270px] h-[100px] pointer-events-none z-0 overflow-visible" style={{ transform: `rotateX(65deg) rotateZ(-15deg)` }}>
+            {/* TRILHO DA ÓRBITA: Centrado de forma absoluta e fixo */}
+            <svg 
+              className="absolute w-[270px] h-[100px] pointer-events-none z-0 overflow-visible left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" 
+              style={{ transform: `rotateX(65deg) rotateZ(-15deg)` }}
+            >
               <ellipse 
                 cx="135" 
                 cy="50" 
@@ -174,18 +177,16 @@ export default function LoginPage() {
                 fill="none" 
                 stroke="rgba(16, 185, 129, 0.25)" 
                 strokeWidth="1.5"
-                className="filter drop-shadow-[0_0_6px_rgba(16,185,129,0.7)]"
+                className="filter drop-shadow-[0_0_6px_rgba(16, 185, 129, 0.7)]"
               />
             </svg>
 
-            {/* PONTOS DE NEON ORBITAIS (Correndo ao longo da linha) */}
+            {/* PONTOS DE NEON ORBITAIS (Absolutamente centrados e correndo no trilho) */}
             {orbitDots.map(dot => {
-              // Calcular a posição baseada no tempo
               const theta = 0.5 * time + dot.phaseOffset;
               const cx = 120 * Math.cos(theta);
               const cz = 45 * Math.sin(theta);
               
-              // Inclinação de rotação 3D correspondente à linha do anel
               const cy = -cz * Math.sin(tiltAngle);
               const finalZ = cz * Math.cos(tiltAngle);
               
@@ -194,9 +195,9 @@ export default function LoginPage() {
               return (
                 <div
                   key={dot.id}
-                  className="absolute w-1.5 h-1.5 rounded-full bg-[#5af0b9] shadow-[0_0_8px_#10b981,0_0_12px_#10b981] z-20 transition-all duration-75 will-change-transform"
+                  className="absolute w-1.5 h-1.5 rounded-full bg-[#5af0b9] shadow-[0_0_8px_#10b981,0_0_12px_#10b981] left-1/2 top-1/2 transition-all duration-75 will-change-transform"
                   style={{
-                    transform: `translate3d(${cx}px, ${cy}px, ${finalZ}px)`,
+                    transform: `translate3d(calc(-50% + ${cx}px), calc(-50% + ${cy}px), ${finalZ}px)`,
                     zIndex: zIndex,
                     opacity: finalZ > 0 ? 1 : 0.4
                   }}
@@ -204,7 +205,7 @@ export default function LoginPage() {
               );
             })}
 
-            {/* MASCOTE DO TUBARÃO GIGANTE (VISUAL ANCHOR - ESTÁTICO COM RESPIRAÇÃO) */}
+            {/* MASCOTE DO TUBARÃO GIGANTE */}
             <div 
               className="w-56 h-56 relative flex items-center justify-center z-10 transition-transform duration-75 will-change-transform"
               style={{ 
@@ -232,32 +233,23 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* BLOCOS 3D EM ÓRBITA REALISTA COM DEPTH SORTING (IDÊNTICO À IMAGEM) */}
+            {/* BLOCOS 3D EM ÓRBITA REALISTA (Centrados com left-1/2 e top-1/2 para fixação perfeita no mobile) */}
             {orbitingIcons.map(icon => {
-              // Calcular ângulo orbital
               const theta = ((2 * Math.PI) / icon.period) * time + icon.initialPhase;
               
-              // Coordenadas 3D
               const cx = rx * Math.cos(theta);
               const cz = rz * Math.sin(theta); 
               
-              // Inclinação
               const cy = -cz * Math.sin(tiltAngle);
-              
-              // Flutuação vertical individual
               const yFloat = Math.sin((2 * Math.PI * time) / 3.5 + icon.floatPhaseOffset) * 5;
               const finalY = cy + yFloat;
 
-              // Z' final para Depth Sorting
               const finalZ = cz * Math.cos(tiltAngle);
-
-              // Depth styling adaptativo
               const maxZ = rz * Math.cos(tiltAngle);
-              const normDepth = finalZ / maxZ; // -1 a 1
+              const normDepth = finalZ / maxZ;
 
-              // Escala, Opacidade e Desfoque baseados na profundidade
-              const scale = 0.95 + 0.2 * normDepth; // 115% na frente, 75% atrás
-              const opacity = 0.8 + 0.2 * normDepth; // 100% frente, 60% atrás
+              const scale = 0.95 + 0.2 * normDepth;
+              const opacity = 0.8 + 0.2 * normDepth;
               const blur = Math.max(0, (1 - normDepth) * 1.5);
               const shadowOpacity = 0.2 + 0.45 * ((normDepth + 1) / 2);
 
@@ -266,9 +258,9 @@ export default function LoginPage() {
               return (
                 <div
                   key={icon.id}
-                  className="absolute w-15 h-15 rounded-[22px] border flex items-center justify-center transition-all duration-75 will-change-transform shadow-2xl"
+                  className="absolute w-15 h-15 rounded-[22px] border flex items-center justify-center left-1/2 top-1/2 transition-all duration-75 will-change-transform shadow-2xl"
                   style={{
-                    transform: `translate3d(${cx}px, ${finalY}px, ${finalZ}px) scale(${scale}) ${icon.tiltRotation}`,
+                    transform: `translate3d(calc(-50% + ${cx}px), calc(-50% + ${finalY}px), ${finalZ}px) scale(${scale}) ${icon.tiltRotation}`,
                     opacity: opacity,
                     filter: `blur(${blur}px)`,
                     zIndex: zIndex,
@@ -276,7 +268,6 @@ export default function LoginPage() {
                       0 ${12 * scale}px ${24 * scale}px rgba(0, 0, 0, ${shadowOpacity}),
                       inset 0 2px 4px rgba(255, 255, 255, ${icon.isGold ? 0.25 : 0.12})
                     `,
-                    // Cores idênticas à imagem (Verde Escuro Metálico ou Ouro Metálico)
                     background: icon.isGold 
                       ? "linear-gradient(135deg, #a77013 0%, #462e03 100%)"
                       : "linear-gradient(135deg, #0d3827 0%, #031710 100%)",
@@ -292,7 +283,7 @@ export default function LoginPage() {
 
           </div>
 
-          {/* Top Brand Tag (Espaçamento ideal de 50px do tubarão) */}
+          {/* Top Brand Tag */}
           <div 
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#053728] border border-emerald-500/40 shrink-0 shadow-lg z-30"
             style={{ marginTop: "48px" }}
