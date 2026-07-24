@@ -98,7 +98,7 @@ export function SharkHero() {
   );
 
   return (
-    <div className="relative mx-auto flex h-[280px] w-full max-w-[380px] items-center justify-center [perspective:1000px] select-none pointer-events-none">
+    <div className="relative mx-auto flex h-[190px] sm:h-[270px] w-full max-w-[380px] items-center justify-center [perspective:1000px] select-none pointer-events-none scale-[0.78] sm:scale-100 origin-center">
       {/* CSS das animações e keyframes originais de lux-orbit-zen */}
       <style jsx global>{`
         @keyframes shark-breathe-zen {
