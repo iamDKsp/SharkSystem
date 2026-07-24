@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Lock, Mail, Eye, EyeOff, LogIn, Shield, Wifi, Battery, Sparkles, DollarSign, Zap, TrendingUp } from "lucide-react";
+import Image from "next/image";
+import sharkAvatar from "./shark-avatar.png";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -97,14 +99,15 @@ export default function LoginPage() {
               <TrendingUp className="w-4 h-4" />
             </div>
 
-            {/* MAIN SHARK AVATAR (GIGANTE E VISÍVEL) */}
+            {/* MAIN SHARK AVATAR (GIGANTE E 100% GARANTIDO DE CARREGAR) */}
             <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-full p-[3px] bg-gradient-to-tr from-emerald-400 via-emerald-300 to-teal-500 shadow-[0_0_25px_rgba(16,185,129,0.6)] z-10 overflow-hidden relative flex items-center justify-center">
-              <div className="w-full h-full rounded-full bg-[#021f17] overflow-hidden flex items-center justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/shark-avatar.png"
+              <div className="w-full h-full rounded-full bg-[#021f17] overflow-hidden flex items-center justify-center relative">
+                <Image
+                  src={sharkAvatar}
                   alt="Shark System Avatar"
+                  placeholder="blur"
                   className="w-full h-full object-cover object-center transform scale-110"
+                  priority
                 />
               </div>
             </div>
