@@ -1,3 +1,4 @@
+// Shark System - Deployment v2.0 - Redeploy Railway
 import { prisma } from "@/lib/db";
 import { SharkAppShell } from "@/components/SharkAppShell";
 import { Client, Loan, Installment, PaymentReceipt, Partner, AuditLog, ChequeItem } from "@/types";
