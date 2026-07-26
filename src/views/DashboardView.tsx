@@ -43,22 +43,48 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onMarkInstallmentPaid,
 }) => {
   const totalCapitalInField = loans.reduce((acc, l) => acc + (Number(l?.amount) || 0), 0);
-  const totalToReceive = loans.reduce((acc, l) => acc + (Number(l?.remainingAmount) || 0), 0) || 138500;
+  const totalToReceive = loans.reduce((acc, l) => acc + (Number(l?.remainingAmount) || 0), 0);
   const overdueLoans = loans.filter(l => l.status === 'atrasado');
 
-  const todayInstallments = installments.filter(i => i.status === 'vencendo_hoje' || i.status === 'pendente');
-  const todayTotal = todayInstallments.reduce((acc, i) => acc + (Number(i?.amount) || 0), 0) || 0;
+  const todayInstallments = installments.filter(i => i.status === 'vencendo_hoje');
+  const todayTotal = todayInstallments.reduce((acc, i) => acc + (Number(i?.amount) || 0), 0);
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  
+  const getFutureDateStr = (days: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + days);
+    return d.toISOString().split('T')[0];
+  };
 
   const weeklyReceivables = installments
-    .filter(i => i.status === 'pendente' || i.status === 'vencendo_hoje')
-    .reduce((acc, i) => acc + (Number(i?.amount) || 0), 0) || 18250;
-  const monthlyReceivables = totalToReceive * 0.45;
-  const yearlyReceivables = totalToReceive * 1.1;
+    .filter(i => i.status !== 'paga' && i.dueDate >= todayStr && i.dueDate <= getFutureDateStr(7))
+    .reduce((acc, i) => acc + (Number(i?.amount) || 0), 0);
 
-  const ownCapitalPercentage = 78;
-  const partnerCapitalPercentage = 22;
-  const ownCapitalAmount = (totalToReceive * ownCapitalPercentage) / 100;
-  const partnerCapitalAmount = (totalToReceive * partnerCapitalPercentage) / 100;
+  const monthlyReceivables = installments
+    .filter(i => i.status !== 'paga' && i.dueDate >= todayStr && i.dueDate <= getFutureDateStr(30))
+    .reduce((acc, i) => acc + (Number(i?.amount) || 0), 0);
+
+  const yearlyReceivables = installments
+    .filter(i => i.status !== 'paga' && i.dueDate >= todayStr && i.dueDate <= getFutureDateStr(365))
+    .reduce((acc, i) => acc + (Number(i?.amount) || 0), 0);
+
+  const totalActiveRemaining = loans
+    .filter(l => l.status !== 'quitado')
+    .reduce((acc, l) => acc + l.remainingAmount, 0);
+
+  const partnerCapitalAmount = loans
+    .filter(l => l.status !== 'quitado' && l.partnerName)
+    .reduce((acc, l) => acc + l.remainingAmount, 0);
+
+  const ownCapitalAmount = totalActiveRemaining - partnerCapitalAmount;
+
+  const ownCapitalPercentage = totalActiveRemaining > 0 
+    ? Math.round((ownCapitalAmount / totalActiveRemaining) * 100) 
+    : 100;
+  const partnerCapitalPercentage = totalActiveRemaining > 0 
+    ? Math.round((partnerCapitalAmount / totalActiveRemaining) * 100) 
+    : 0;
 
   const totalInterestEarned = loans.reduce((acc, l) => acc + (l.totalToReceive - l.amount), 0);
   const monthBilled = loans.reduce((acc, l) => acc + l.totalPaid, 0);
@@ -69,14 +95,34 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const activePotentialProfit = totalInterestEarned;
   const averageTicket = loans.length > 0 ? totalCapitalInField / loans.length : 7250;
 
-  const projectionData = [
-    { month: 'Jul', amount: Math.round(totalToReceive * 0.15) || 28500 },
-    { month: 'Ago', amount: Math.round(totalToReceive * 0.22) || 34200 },
-    { month: 'Set', amount: Math.round(totalToReceive * 0.19) || 31800 },
-    { month: 'Out', amount: Math.round(totalToReceive * 0.25) || 39500 },
-    { month: 'Nov', amount: Math.round(totalToReceive * 0.28) || 42000 },
-    { month: 'Dez', amount: Math.round(totalToReceive * 0.32) || 48600 },
-  ];
+  const getProjectionData = () => {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const data: { month: string; amount: number }[] = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 6; i++) {
+      const targetDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      const monthIndex = targetDate.getMonth();
+      const yearStr = targetDate.getFullYear();
+      const monthLabel = months[monthIndex];
+
+      const amount = installments
+        .filter(inst => {
+          if (inst.status === 'paga') return false;
+          const instDate = new Date(inst.dueDate);
+          return instDate.getMonth() === monthIndex && instDate.getFullYear() === yearStr;
+        })
+        .reduce((acc, inst) => acc + inst.amount, 0);
+
+      data.push({
+        month: monthLabel,
+        amount: Math.round(amount),
+      });
+    }
+    return data;
+  };
+
+  const projectionData = getProjectionData();
 
   return (
     <div className="space-y-5 pb-20 animate-in fade-in duration-300">
