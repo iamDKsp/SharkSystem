@@ -61,12 +61,12 @@ export default function LoginPage() {
       />
 
       {/* ════════════════════════════════════════
-          HERO — ocupa o espaço disponível acima do card
+          HERO — descido para ficar próximo do card
           ════════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col items-center justify-end pb-0 px-4 z-10 relative min-h-0">
-        {/* Tubarão — grande e centralizado no mobile */}
+      <div className="flex flex-col items-center justify-end pb-2 px-4 z-10 relative" style={{ paddingTop: "4vh" }}>
+        {/* Tubarão — tamanho reduzido para não dominar a tela */}
         <div className="w-full flex items-center justify-center"
-          style={{ maxHeight: "58vh" }}
+          style={{ maxHeight: "42vh" }}
         >
           <SharkHero compact />
         </div>

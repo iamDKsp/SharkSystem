@@ -1,12 +1,6 @@
 import { defineConfig } from "prisma/config";
 
-const databaseUrl = process.env["DATABASE_URL"];
-
-if (!databaseUrl) {
-  throw new Error(
-    "❌ DATABASE_URL não está definida! Adicione essa variável de ambiente no Railway (Settings > Variables)."
-  );
-}
+const databaseUrl = process.env["DATABASE_URL"] || "postgresql://postgres:postgres@localhost:5433/sharksystem";
 
 export default defineConfig({
   schema: "prisma/schema.prisma",
