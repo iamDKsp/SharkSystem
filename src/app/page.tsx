@@ -63,6 +63,7 @@ export default async function DashboardPage() {
         city: c.cidade || "Bauru - SP",
         creditLimit: 10000,
         status: c.blacklist ? "inadimplente" : "ativo",
+        avatarUrl: c.foto_url || undefined,
         notes: c.observacoes || undefined,
         activeLoansCount: safeEmprestimos.filter(e => e.cliente_id === c.id && e.status === "ativo").length,
         totalBorrowed: safeEmprestimos.filter(e => e.cliente_id === c.id).reduce((acc, e) => acc + Number(e.valor_emprestado || 0), 0),
