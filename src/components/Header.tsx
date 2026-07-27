@@ -6,7 +6,9 @@ import {
   Monitor, 
   Calendar,
   ShieldCheck,
-  Zap
+  Zap,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { ViewMode } from '../types';
 
@@ -23,6 +25,8 @@ interface HeaderProps {
   avatarUrl: string | null;
   qrConnected?: boolean;
   onOpenProfilePopup: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -38,6 +42,8 @@ export const Header: React.FC<HeaderProps> = ({
   avatarUrl,
   qrConnected = true,
   onOpenProfilePopup,
+  theme = 'dark',
+  onToggleTheme,
 }) => {
   const getViewTitle = () => {
     switch (currentView) {
@@ -109,6 +115,16 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className="p-2 rounded-xl bg-[#111827] text-amber-400 hover:text-amber-300 transition border border-[#1F2937]"
+                title={theme === 'dark' ? "Alternar para Modo Claro (Fundo Branco)" : "Alternar para Modo Escuro"}
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-400" />}
+              </button>
+            )}
+
             {onOpenNotifications && (
               <button
                 onClick={onOpenNotifications}

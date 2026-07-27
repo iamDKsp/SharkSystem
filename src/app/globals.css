@@ -27,22 +27,36 @@
   --font-geist-sans: var(--font-geist-sans), Inter, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #090d16;
-    --foreground: #f8fafc;
-    
-    --primary: #38bdf8;
-    --primary-foreground: #090d16;
-    
-    --card: rgba(15, 23, 42, 0.45);
-    --card-foreground: #f8fafc;
-    
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
-    
-    --border: rgba(255, 255, 255, 0.08);
-  }
+html.light {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  
+  --primary: #00d084;
+  --primary-foreground: #ffffff;
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+  
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  
+  --border: #e2e8f0;
+}
+
+html.dark {
+  --background: #090d16;
+  --foreground: #f8fafc;
+  
+  --primary: #38bdf8;
+  --primary-foreground: #090d16;
+  
+  --card: rgba(15, 23, 42, 0.45);
+  --card-foreground: #f8fafc;
+  
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  
+  --border: rgba(255, 255, 255, 0.08);
 }
 
 body {

@@ -326,23 +326,23 @@ export async function receberSoJurosEmprestimo(emprestimoId: string) {
   const hoje = new Date();
 
   await prisma.$transaction(async (tx) => {
-    // 1. Encontra o empréstimo com as parcelas abertas
+    // 1. Encontra o empréstimo com as parcelas abertas ou atrasadas
     const emprestimo = await tx.emprestimo.findUnique({
       where: { id: emprestimoId },
-      include: { parcelas: { where: { status: "aberto" }, orderBy: { numero: "asc" } } },
+      include: { parcelas: { where: { status: { in: ["aberto", "atrasado"] } }, orderBy: { numero: "asc" } } },
     });
 
     if (!emprestimo || emprestimo.parcelas.length === 0) {
-      throw new Error("Empréstimo não encontrado ou sem parcelas em aberto.");
+      throw new Error("Empréstimo não encontrado ou sem parcelas pendentes para renovação.");
     }
 
-    // 2. Pega a primeira parcela em aberto
+    // 2. Pega a primeira parcela pendente (aberta ou atrasada)
     const parcelaAtual = emprestimo.parcelas[0];
 
-    // 3. Calcula juros do empréstimo (baseado no valor original emprestado)
+    // 3. Calcula juros do empréstimo (baseado no valor original emprestado ou taxa)
     const valorEmprestado = Number(emprestimo.valor_emprestado);
     const taxaJuros = Number(emprestimo.taxa_juros);
-    const valorJuros = valorEmprestado * (taxaJuros / 100);
+    const valorJuros = taxaJuros > 0 ? valorEmprestado * (taxaJuros / 100) : Number(parcelaAtual.valor);
 
     if (valorJuros <= 0) {
       throw new Error("O empréstimo não possui taxa de juros configurada para calcular o recebimento.");
@@ -381,18 +381,21 @@ export async function receberSoJurosEmprestimo(emprestimoId: string) {
       },
     });
 
-    // 6. O vencimento global do empréstimo também deve refletir
+    // 6. O vencimento global do empréstimo e status também devem refletir
     await tx.emprestimo.update({
       where: { id: emprestimoId },
       data: {
         data_vencimento: novoVencimento,
+        status: "em_dia",
       },
     });
   });
 
   revalidatePath(`/emprestimos/${emprestimoId}`);
   revalidatePath("/emprestimos");
+  revalidatePath("/cobrancas");
   revalidatePath("/clientes");
+  revalidatePath("/");
   return { success: true };
 }
 

@@ -12,6 +12,7 @@ interface WhatsAppModalProps {
   daysOverdue?: number;
   templateType?: 'lembrete' | 'atraso' | 'notificacao';
   loanId?: string;
+  pixKey?: string;
   onMarkCobrado?: (loanId: string) => Promise<void>;
 }
 
@@ -26,6 +27,7 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
   daysOverdue = 0,
   templateType = 'lembrete',
   loanId,
+  pixKey = '14991185521 (RONIVALDO GABRIEL OSCAR - ITAÚ)',
   onMarkCobrado,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -40,16 +42,17 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
 
   const getMessageText = () => {
     const formattedAmount = `R$ ${(Number(amount) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
+    const effectivePix = pixKey || '14991185521 (RONIVALDO GABRIEL OSCAR - ITAÚ)';
     
     if (currentTemplate === 'lembrete') {
-      return `Olá *${clientName}*, tudo bem?\n\nPassando para lembrar que a sua parcela do contrato *${loanCode}* no valor de *${formattedAmount}* vence em *${dueDate}*.\n\nPara facilitar o pagamento, nossa chave PIX é: *financeira@shark.com.br*.\n\nQualquer dúvida estamos à disposição! 👍🏼`;
+      return `Olá *${clientName}*, tudo bem?\n\nPassando para lembrar que a sua parcela do contrato *${loanCode}* no valor de *${formattedAmount}* vence em *${dueDate}*.\n\nPara facilitar o pagamento, nossa chave PIX é: *${effectivePix}*.\n\nQualquer dúvida estamos à disposição! 👍🏼`;
     }
     
     if (currentTemplate === 'atraso') {
-      return `Atenção *${clientName}*,\n\nIdentificamos que a sua parcela do contrato *${loanCode}* no valor de *${formattedAmount}* encontra-se com *${daysOverdue || 5} dias de atraso*.\n\nPedimos a gentileza de entrar em contato para regularização e evitar a inclusão de encargos diários de mora.\n\nChave PIX Oficial: *financeira@shark.com.br*\n\nShark System - Gestão Financeira`;
+      return `Atenção *${clientName}*,\n\nIdentificamos que a sua parcela do contrato *${loanCode}* no valor de *${formattedAmount}* encontra-se com *${daysOverdue || 5} dias de atraso*.\n\nPedimos a gentileza de entrar em contato para regularização e evitar a inclusão de encargos diários de mora.\n\nChave PIX Oficial: *${effectivePix}*\n\nShark System - Gestão Financeira`;
     }
 
-    return `NOTIFICAÇÃO EXTRAJUDICIAL DE COBRANÇA\n\nPrezado(a) *${clientName}*,\n\nConsta em nosso sistema o débito em aberto do contrato *${loanCode}*, com vencimento em *${dueDate}*, no valor total de *${formattedAmount}*.\n\nSolicitamos a quitação imediata dentro do prazo de 24 horas para evitar medidas administrativas adicionais.\n\nAtenciosamente,\n*Shark System - Departamento de Cobrança*`;
+    return `NOTIFICAÇÃO EXTRAJUDICIAL DE COBRANÇA\n\nPrezado(a) *${clientName}*,\n\nConsta em nosso sistema o débito em aberto do contrato *${loanCode}*, com vencimento em *${dueDate}*, no valor total de *${formattedAmount}*.\n\nSolicitamos a quitação imediata dentro do prazo de 24 horas para evitar medidas administrativas adicionais.\n\nChave PIX Oficial: *${effectivePix}*\n\nAtenciosamente,\n*Shark System - Departamento de Cobrança*`;
   };
 
   const messageText = getMessageText();

@@ -406,16 +406,16 @@ export default function ClientCobrancasView({ atrasados, hojeLista, aVencer }: C
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div>
-          <h1 className="text-sm font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-zinc-800 to-zinc-950 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
-            Painel de Cobranças
+          <h1 className="text-xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-zinc-800 to-zinc-950 dark:from-white dark:via-zinc-200 dark:to-zinc-400 bg-clip-text text-transparent">
+            Painel de Cobranças & Disparo em Massa
           </h1>
           <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
-            Gerenciamento estratégico de lembretes e cobranças em massa.
+            Gerenciamento estratégico de lembretes e disparo automatizado via WhatsApp.
           </p>
         </div>
         <div className="flex items-center gap-3">
           {/* Legenda do Pipeline — explica as cores para o usuário */}
-          <div className="hidden md:flex items-center gap-3 text-sm text-zinc-500">
+          <div className="hidden md:flex items-center gap-3 text-xs text-zinc-500">
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block" /> Atrasado</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Vence Hoje</span>
             <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> A Vencer</span>
@@ -428,6 +428,48 @@ export default function ClientCobrancasView({ atrasados, hojeLista, aVencer }: C
             <Settings className="w-4 h-4 text-emerald-500" />
             <span>Configurar Mensagens</span>
           </button>
+        </div>
+      </div>
+
+      {/* BANNER DESTACADO: DISPARO EM MASSA RÁPIDO */}
+      <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-900/40 via-slate-900 to-indigo-950/40 border border-emerald-500/30 shadow-xl space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-black text-white flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-[#00D084]" />
+              <span>⚡ Disparo de Cobrança em Massa</span>
+            </h2>
+            <p className="text-xs text-zinc-300 mt-1">
+              Selecione os clientes do dia e envie mensagens de cobrança automáticas via WhatsApp com um único clique.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => {
+                const ids = atrasados.map(p => p.id);
+                setSelectedAtrasados(ids);
+                handleMassTrigger(ids, "atrasados");
+              }}
+              disabled={atrasados.length === 0}
+              className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md transition disabled:opacity-50"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>Cobrar Atrasados ({atrasados.length})</span>
+            </button>
+
+            <button
+              onClick={() => {
+                const ids = hojeLista.map(p => p.id);
+                setSelectedHoje(ids);
+                handleMassTrigger(ids, "hoje");
+              }}
+              disabled={hojeLista.length === 0}
+              className="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md transition disabled:opacity-50"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span>Cobrar Vencendo Hoje ({hojeLista.length})</span>
+            </button>
+          </div>
         </div>
       </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useTransition } from 'react';
+import React, { useState, useEffect, useTransition } from 'react';
 import { Header } from './Header';
 import { BottomNav } from './BottomNav';
 import { QuickActionModal } from './QuickActionModal';
@@ -139,10 +139,53 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
     companySubtext: 'Gestão de Empréstimos',
     defaultInterestRate: 10,
     defaultLateFeeRate: 2,
-    pixKey: 'financeira@shark.com.br',
-    whatsappGreetingTemplate: 'Olá {cliente}, lembramos que a parcela {codigo} de R$ {valor} vence em {vencimento}.',
-    whatsappOverdueTemplate: 'Atenção {cliente}, a parcela {codigo} de R$ {valor} está vencida há {dias} dias.',
+    pixKey: '14991185521 (RONIVALDO GABRIEL OSCAR - ITAÚ)',
+    whatsappGreetingTemplate: 'Olá {cliente}, lembramos que a parcela {codigo} de R$ {valor} vence em {vencimento}. Chave PIX: 14991185521',
+    whatsappOverdueTemplate: 'Atenção {cliente}, a parcela {codigo} de R$ {valor} está vencida há {dias} dias. Chave PIX: 14991185521',
   });
+
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('shark_theme') as 'dark' | 'light' | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === 'light') {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+      } else {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+      }
+    }
+
+    const savedSettings = localStorage.getItem('shark_system_settings');
+    if (savedSettings) {
+      try {
+        setSettings(JSON.parse(savedSettings));
+      } catch (e) {
+        console.error("Erro ao carregar settings:", e);
+      }
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+    localStorage.setItem('shark_theme', nextTheme);
+    if (nextTheme === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
+    }
+  };
+
+  const handleUpdateSettings = (newSettings: SystemSettings) => {
+    setSettings(newSettings);
+    localStorage.setItem('shark_system_settings', JSON.stringify(newSettings));
+  };
 
   // Handlers for data mutations (Optimistic UI + Server Actions)
   const handleAddClient = (newClientData: Omit<Client, 'id' | 'activeLoansCount' | 'totalBorrowed'>) => {
@@ -465,7 +508,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#090D16] text-white flex flex-col font-sans selection:bg-[#00D084] selection:text-slate-950">
+    <div className="min-h-screen bg-[#090D16] light:bg-slate-50 text-white light:text-slate-900 flex flex-col font-sans selection:bg-[#00D084] selection:text-slate-950">
       
       <Header
         currentView={currentView}
@@ -476,6 +519,8 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         unreadNotificationsCount={3}
         onOpenNotifications={() => setIsNotificationOpen(true)}
         onOpenProfilePopup={() => setIsProfilePopupOpen(true)}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-6 pt-4">
@@ -560,7 +605,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         {currentView === 'configuracoes' && (
           <ConfiguracoesView
             settings={settings}
-            onUpdateSettings={setSettings}
+            onUpdateSettings={handleUpdateSettings}
           />
         )}
       </main>
@@ -625,6 +670,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         dueDate={whatsAppModalData.dueDate}
         daysOverdue={whatsAppModalData.daysOverdue}
         loanId={whatsAppModalData.loanId}
+        pixKey={settings.pixKey}
         onMarkCobrado={handleMarkCobrado}
       />
 

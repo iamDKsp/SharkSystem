@@ -146,7 +146,7 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center justify-between pt-1 gap-2">
                 <button
                   onClick={() => onOpenWhatsApp(client.name, client.phone, activeLoan?.code || 'CONTRATO', activeLoan?.remainingAmount || 1000, activeLoan?.nextDueDate || '2026-07-25')}
                   className="px-3 py-1.5 rounded-xl bg-emerald-500/10 text-[#00D084] hover:bg-[#00D084] hover:text-slate-950 font-bold text-xs flex items-center gap-1.5 transition border border-emerald-500/20"
@@ -155,11 +155,29 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
                   <span>WhatsApp</span>
                 </button>
 
+                {activeLoan ? (
+                  <a
+                    href={`/emprestimos/${activeLoan.id}`}
+                    className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-[#00D084] to-[#10B981] text-slate-950 font-black text-xs flex items-center gap-1 transition shadow-sm hover:brightness-110"
+                  >
+                    <Banknote className="w-3.5 h-3.5" />
+                    <span>Empréstimo ({activeLoan.code})</span>
+                  </a>
+                ) : (
+                  <a
+                    href={`/clientes/${client.id}`}
+                    className="px-3 py-1.5 rounded-xl bg-[#151D2D] text-gray-300 hover:text-white font-bold text-xs flex items-center gap-1 transition border border-[#1F2937]"
+                  >
+                    <span>Ver Cliente</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  </a>
+                )}
+
                 <button
                   onClick={() => setSelectedClient(client)}
-                  className="px-3 py-1.5 rounded-xl bg-[#151D2D] text-gray-300 hover:text-white font-bold text-xs flex items-center gap-1 transition border border-[#1F2937]"
+                  className="px-2.5 py-1.5 rounded-xl bg-[#151D2D] text-gray-400 hover:text-white font-bold text-xs transition border border-[#1F2937]"
+                  title="Resumo rápido"
                 >
-                  <span>Detalhes</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -196,15 +214,21 @@ export const ClientesView: React.FC<ClientesViewProps> = ({
               <div>
                 <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Histórico de Empréstimos</h4>
                 {loans.filter(l => l.clientId === selectedClient.id).map(l => (
-                  <div key={l.id} className="p-3 rounded-xl bg-[#151D2D] border border-[#1F2937] flex items-center justify-between text-xs my-1">
+                  <a
+                    key={l.id}
+                    href={`/emprestimos/${l.id}`}
+                    className="p-3 rounded-xl bg-[#151D2D] border border-[#1F2937] hover:border-[#00D084] flex items-center justify-between text-xs my-1 group transition block"
+                  >
                     <div>
-                      <p className="font-bold text-white">{l.code}</p>
+                      <p className="font-bold text-white group-hover:text-[#00D084] flex items-center gap-1">
+                        {l.code} <ChevronRight className="w-3 h-3 text-[#00D084]" />
+                      </p>
                       <p className="text-gray-400">R$ {(Number(l?.amount) || 0).toLocaleString('pt-BR')} ({l.interestRate}% a.m.)</p>
                     </div>
                     <span className="font-mono font-bold text-[#00D084]">
                       R$ {(Number(l?.remainingAmount) || 0).toLocaleString('pt-BR')} restantes
                     </span>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
