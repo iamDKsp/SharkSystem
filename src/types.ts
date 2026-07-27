@@ -34,6 +34,7 @@ export interface Loan {
   clientId: string;
   clientName: string;
   clientPhone: string;
+  clientAvatarUrl?: string;
   amount: number; // Valor Principal
   interestRate: number; // e.g., 20%
   totalToReceive: number; // Principal + Juros
@@ -54,6 +55,7 @@ export interface Installment {
   loanId: string;
   loanCode: string;
   clientName: string;
+  clientAvatarUrl?: string;
   number: number;
   totalNumber: number;
   amount: number;

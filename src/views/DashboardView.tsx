@@ -173,9 +173,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </motion.div>
 
         <div className="col-span-5 flex flex-col justify-between gap-2">
-          <div className="p-2.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#00D084]/10 text-[#00D084] flex items-center justify-center shrink-0">
-              <Heart className="w-4 h-4 fill-[#00D084]/30" />
+          <div 
+            onClick={() => setCurrentView('emprestimos')}
+            className="p-2.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] hover:border-[#00D084]/50 flex items-center gap-2.5 cursor-pointer transition active:scale-95 group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#00D084]/10 text-[#00D084] flex items-center justify-center shrink-0 group-hover:scale-110 transition">
+              <DollarSign className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider leading-none">A Receber</p>
@@ -185,8 +188,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#00D084]/10 text-[#00D084] flex items-center justify-center shrink-0">
+          <div 
+            onClick={() => setCurrentView('parcelas')}
+            className="p-2.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] hover:border-[#00D084]/50 flex items-center gap-2.5 cursor-pointer transition active:scale-95 group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#00D084]/10 text-[#00D084] flex items-center justify-center shrink-0 group-hover:scale-110 transition">
               <Clock className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
@@ -197,8 +203,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0">
+          <div 
+            onClick={() => setCurrentView('cobrancas')}
+            className="p-2.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] hover:border-rose-500/50 flex items-center gap-2.5 cursor-pointer transition active:scale-95 group"
+          >
+            <div className="w-8 h-8 rounded-xl bg-rose-500/10 text-rose-400 flex items-center justify-center shrink-0 group-hover:scale-110 transition">
               <AlertTriangle className="w-4 h-4" />
             </div>
             <div className="min-w-0 flex-1">
@@ -219,32 +228,37 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="flex items-center -space-x-2 overflow-hidden">
-            {clients.slice(0, 3).map((client, idx) => (
-              client.avatarUrl ? (
+            {loans.slice(0, 4).map((loan, idx) => {
+              const client = clients.find(c => c.id === loan.clientId || c.name === loan.clientName);
+              const avatarUrl = client?.avatarUrl || loan.clientAvatarUrl;
+
+              return avatarUrl ? (
                 <img
-                  key={client.id || idx}
+                  key={loan.id || idx}
                   className="inline-block h-8 w-8 rounded-full ring-2 ring-[#0B0F17] object-cover shadow-sm"
-                  src={client.avatarUrl}
-                  alt={client.name}
+                  src={avatarUrl}
+                  alt={loan.clientName}
                 />
               ) : (
                 <div 
-                  key={client.id || idx} 
+                  key={loan.id || idx} 
                   className="inline-block h-8 w-8 rounded-full ring-2 ring-[#0B0F17] bg-[#1E293B] text-[#00D084] font-bold text-xs flex items-center justify-center"
                 >
-                  {(client?.name || 'C').charAt(0)}
+                  {(loan?.clientName || 'C').charAt(0)}
                 </div>
-              )
-            ))}
+              );
+            })}
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1E293B] text-[10px] font-bold text-gray-300 ring-2 ring-[#0B0F17]">
-              +{clients.length}
+              +{Math.max(0, loans.length - 4)}
             </div>
           </div>
         </div>
 
         <div className="space-y-2">
           {loans.slice(0, 4).map((loan) => {
-            const client = clients.find(c => c.id === loan.clientId);
+            const client = clients.find(c => c.id === loan.clientId || c.name === loan.clientName);
+            const avatarUrl = client?.avatarUrl || loan.clientAvatarUrl;
+            
             return (
               <motion.div
                 key={loan.id}
@@ -254,9 +268,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 className="p-3.5 rounded-2xl bg-[#0F172A] border border-[#1E293B] hover:border-[#00D084]/40 transition flex items-center justify-between cursor-pointer group"
               >
                 <div className="flex items-center gap-3">
-                  {client?.avatarUrl ? (
+                  {avatarUrl ? (
                     <img 
-                      src={client.avatarUrl} 
+                      src={avatarUrl} 
                       alt={loan.clientName}
                       className="w-10 h-10 rounded-xl object-cover ring-1 ring-[#00D084]/40 shrink-0"
                     />
@@ -326,7 +340,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="space-y-2.5">
             {todayInstallments.slice(0, 3).map((item) => {
               const loan = loans.find(l => l.id === item.loanId);
-              const client = clients.find(c => c.id === loan?.clientId);
+              const client = clients.find(c => c.id === loan?.clientId || c.name === item.clientName);
+              const avatarUrl = client?.avatarUrl || item.clientAvatarUrl || loan?.clientAvatarUrl;
               const isPaid = item.status === 'paga';
 
               return (
@@ -339,9 +354,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-8 h-8 rounded-xl bg-[#1E293B] text-[#00D084] font-bold text-xs flex items-center justify-center shrink-0">
-                      {(item?.clientName || 'C').charAt(0)}
-                    </div>
+                    {avatarUrl ? (
+                      <img 
+                        src={avatarUrl} 
+                        alt={item.clientName}
+                        className="w-9 h-9 rounded-xl object-cover ring-1 ring-[#00D084]/40 shrink-0"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-xl bg-[#1E293B] text-[#00D084] font-bold text-xs flex items-center justify-center shrink-0">
+                        {(item?.clientName || 'C').charAt(0)}
+                      </div>
+                    )}
 
                     <div className="min-w-0">
                       <p className="text-xs font-bold text-white truncate">{item?.clientName || 'Cliente'}</p>
