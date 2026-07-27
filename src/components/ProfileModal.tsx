@@ -58,17 +58,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState(false);
   const [passwordError, setPasswordError] = useState('');
-  const [customPhotoInput, setCustomPhotoInput] = useState('');
-  const [showCustomUrlField, setShowCustomUrlField] = useState(false);
   const [profileSavedMsg, setProfileSavedMsg] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
 
-  const presetAvatars = [
-    { id: 'shark', label: 'Tubarão Shark (Padrão)', url: '/shark-avatar.png' },
-    { id: 'exec1', label: 'Executivo 1', url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=90' },
-    { id: 'exec2', label: 'Executivo 2', url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=90' },
-    { id: 'exec3', label: 'Executivo 3', url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=90' },
-  ];
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setAvatarUrl(result);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleSaveProfileData = (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,25 +104,71 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     setTimeout(() => setPasswordSuccess(false), 4000);
   };
 
-  const handleToggleQrConnection = () => {
-    if (qrConnected) {
-      setQrConnected(false);
-      setQrPhoneDevice('Nenhum aparelho conectado');
+  const [liveQr, setLiveQr] = useState<string | null>(null);
+  const [waStatus, setWaStatus] = useState<string>('disconnected');
+  const [loadingStatus, setLoadingStatus] = useState(false);
+
+  React.useEffect(() => {
+    if (!isOpen || activeTab !== 'qrcode') return;
+
+    let isMounted = true;
+    const fetchStatus = async () => {
+      try {
+        setLoadingStatus(true);
+        const res = await fetch('/api/whatsapp/status');
+        const data = await res.json();
+        if (isMounted) {
+          setWaStatus(data.status || 'disconnected');
+          setLiveQr(data.qr || null);
+          if (data.status === 'connected') {
+            setQrConnected(true);
+            setQrPhoneDevice('WhatsApp Web (Baileys Connected)');
+          } else {
+            setQrConnected(false);
+            setQrPhoneDevice('Aparelho Desconectado');
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao buscar status do WhatsApp:", e);
+      } finally {
+        if (isMounted) setLoadingStatus(false);
+      }
+    };
+
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 3000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, [isOpen, activeTab, setQrConnected, setQrPhoneDevice]);
+
+  const handleToggleQrConnection = async () => {
+    if (qrConnected || waStatus === 'connected') {
+      try {
+        setIsScanning(true);
+        await fetch('/api/whatsapp/logout', { method: 'POST' });
+        setQrConnected(false);
+        setWaStatus('disconnected');
+        setLiveQr(null);
+        setQrPhoneDevice('Nenhum aparelho conectado');
+      } catch (e) {
+        console.error("Erro ao desconectar:", e);
+      } finally {
+        setIsScanning(false);
+      }
     } else {
       setIsScanning(true);
-      setTimeout(() => {
+      try {
+        const res = await fetch('/api/whatsapp/status');
+        const data = await res.json();
+        setWaStatus(data.status || 'disconnected');
+        setLiveQr(data.qr || null);
+      } catch (e) {
+        console.error("Erro ao atualizar QR:", e);
+      } finally {
         setIsScanning(false);
-        setQrConnected(true);
-        setQrPhoneDevice('(11) 98877-6655 • Samsung Galaxy S24 Ultra');
-      }, 2500);
-    }
-  };
-
-  const handleApplyCustomUrl = () => {
-    if (customPhotoInput.trim()) {
-      setAvatarUrl(customPhotoInput.trim());
-      setShowCustomUrlField(false);
-      setCustomPhotoInput('');
+      }
     }
   };
 
@@ -202,10 +253,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             {activeTab === 'dados' && (
               <div className="space-y-5">
                 <div className="p-4 rounded-2xl bg-[#0B0F17] border border-[#1E293B] space-y-3">
-                  <label className="text-xs font-bold text-gray-300 block">Escolha sua Foto de Perfil</label>
+                  <label className="text-xs font-bold text-gray-300 block">Foto de Perfil do Operador</label>
                   
                   <div className="flex flex-col sm:flex-row items-center gap-4">
-                    <div className="relative w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-[#00D084]/50 bg-[#1E293B] shrink-0 flex items-center justify-center">
+                    <div className="relative w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-[#00D084]/50 bg-[#1E293B] shrink-0 flex items-center justify-center shadow-lg">
                       {avatarUrl ? (
                         <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
@@ -216,64 +267,34 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     </div>
 
                     <div className="flex-1 w-full space-y-2">
-                      <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                        {presetAvatars.map((preset) => (
-                          <motion.button
-                            key={preset.id}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setAvatarUrl(preset.url)}
-                            className={`relative w-11 h-11 rounded-xl overflow-hidden border-2 shrink-0 transition ${
-                              avatarUrl === preset.url ? 'border-[#00D084] ring-2 ring-[#00D084]/40' : 'border-gray-700 hover:border-gray-400'
-                            }`}
-                            title={preset.label}
-                          >
-                            <img src={preset.url} alt={preset.label} className="w-full h-full object-cover" />
-                          </motion.button>
-                        ))}
+                      <div className="flex items-center gap-2">
+                        <label className="cursor-pointer py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#00D084] to-[#10B981] text-slate-950 font-extrabold text-xs flex items-center justify-center gap-2 hover:brightness-110 transition shadow-[0_0_15px_rgba(0,208,132,0.25)]">
+                          <Camera className="w-4 h-4 stroke-[2.5]" />
+                          <span>{avatarUrl ? 'Subir Nova Foto' : 'Escolher Foto (Celular/PC)'}</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleFileUpload}
+                            className="hidden"
+                          />
+                        </label>
 
-                        <motion.button
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => setAvatarUrl(null)}
-                          className={`w-11 h-11 rounded-xl border-2 shrink-0 flex items-center justify-center text-xs font-bold transition ${
-                            avatarUrl === null 
-                              ? 'border-[#00D084] bg-[#00D084]/15 text-[#00D084]' 
-                              : 'border-gray-700 bg-[#1E293B] text-gray-400 hover:text-white'
-                          }`}
-                          title="Sem Foto (Usar Iniciais)"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </motion.button>
-                      </div>
-
-                      <div>
-                        {!showCustomUrlField ? (
+                        {avatarUrl && (
                           <button
                             type="button"
-                            onClick={() => setShowCustomUrlField(true)}
-                            className="text-xs text-[#00D084] hover:underline font-bold flex items-center gap-1"
+                            onClick={() => setAvatarUrl(null)}
+                            className="py-2.5 px-3 rounded-xl bg-[#1E293B] border border-gray-700 text-gray-300 hover:text-white font-bold text-xs flex items-center gap-1.5 transition"
+                            title="Remover foto (exibir inicial)"
                           >
-                            <ImageIcon className="w-3.5 h-3.5" />
-                            <span>Inserir URL de Foto Customizada</span>
+                            <Trash2 className="w-4 h-4 text-rose-400" />
+                            <span>Sem Foto</span>
                           </button>
-                        ) : (
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="url"
-                              placeholder="https://sua-imagem.com/foto.jpg"
-                              value={customPhotoInput}
-                              onChange={(e) => setCustomPhotoInput(e.target.value)}
-                              className="flex-1 bg-[#1E293B] border border-[#334155] rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-[#00D084]"
-                            />
-                            <button
-                              type="button"
-                              onClick={handleApplyCustomUrl}
-                              className="px-3 py-1.5 rounded-xl bg-[#00D084] text-slate-950 font-bold text-xs"
-                            >
-                              Aplicar
-                            </button>
-                          </div>
                         )}
                       </div>
+
+                      <p className="text-[10px] text-gray-400">
+                        Selecione uma foto da sua galeria no celular ou do computador (JPG, PNG).
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -442,13 +463,20 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-3">
-                      <div className="p-3 bg-white rounded-2xl shadow-xl relative group">
-                        <div className="w-36 h-36 border-4 border-slate-900 bg-slate-950 rounded-xl p-2 flex flex-col items-center justify-center relative">
-                          <QrCode className="w-28 h-28 text-white" />
-                          <div className="absolute inset-0 bg-emerald-500/10 pointer-events-none animate-pulse rounded-xl" />
+                      {liveQr ? (
+                        <div className="p-3 bg-white rounded-2xl shadow-xl relative group">
+                          <img src={liveQr} alt="QR Code WhatsApp Baileys" className="w-44 h-44 object-contain rounded-xl" />
+                          <div className="absolute inset-0 bg-emerald-500/5 pointer-events-none rounded-xl" />
                         </div>
-                      </div>
-                      <p className="text-xs text-gray-300 font-bold">Abra o WhatsApp no celular &gt; Aparelhos Conectados &gt; Conectar</p>
+                      ) : (
+                        <div className="p-3 bg-white rounded-2xl shadow-xl relative group">
+                          <div className="w-36 h-36 border-4 border-slate-900 bg-slate-950 rounded-xl p-2 flex flex-col items-center justify-center relative">
+                            <QrCode className="w-28 h-28 text-white" />
+                            <div className="absolute inset-0 bg-emerald-500/10 pointer-events-none animate-pulse rounded-xl" />
+                          </div>
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-300 font-bold">Abra o WhatsApp no celular &gt; Aparelhos Conectados &gt; Conectar um Aparelho</p>
                     </div>
                   )}
                 </div>

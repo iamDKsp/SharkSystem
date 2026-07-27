@@ -120,11 +120,14 @@ const server = http.createServer(async (req, res) => {
     req.on("end", async () => {
       try {
         const data = JSON.parse(body);
-        const { messages } = data; // Array details: { phone, text }
+        let messages = data.messages;
+        if (!messages && data.phone) {
+          messages = [{ phone: data.phone, text: data.text || data.message }];
+        }
 
         if (!messages || !Array.isArray(messages)) {
           res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ error: "Invalid payload format" }));
+          res.end(JSON.stringify({ error: "Formato de payload inválido. Envie { phone, message } ou { messages: [...] }" }));
           return;
         }
 
@@ -147,7 +150,7 @@ const server = http.createServer(async (req, res) => {
 
           const jid = formattedPhone + "@s.whatsapp.net";
           console.log(`Sending message to: ${jid}`);
-          await sock.sendMessage(jid, { text: item.text });
+          await sock.sendMessage(jid, { text: item.text || item.message });
           logs.push({ phone: item.phone, status: "sent" });
           
           // delay to mitigate anti-spam restrictions

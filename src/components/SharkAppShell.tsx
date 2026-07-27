@@ -443,6 +443,15 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
       status: 'urgente',
     }));
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (err) {
+      console.error('Erro ao fazer logout:', err);
+    }
+    window.location.href = '/login';
+  };
+
   return (
     <div className="min-h-screen bg-[#090D16] text-white flex flex-col font-sans selection:bg-[#00D084] selection:text-slate-950">
       
@@ -575,7 +584,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         avatarUrl={avatarUrl}
         qrConnected={qrConnected}
         onOpenProfile={() => setIsProfileModalOpen(true)}
-        onLogout={() => alert('Sessão encerrada com segurança.')}
+        onLogout={handleLogout}
       />
 
       <ProfileModal
