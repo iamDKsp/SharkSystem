@@ -1,4 +1,4 @@
-const { default: makeWASocket, useMultiFileAuthState, DisconnectReason } = require("@whiskeysockets/baileys");
+const { default: makeWASocket, useMultiFileAuthState, DisconnectReason, fetchLatestBaileysVersion, Browsers } = require("@whiskeysockets/baileys");
 const http = require("http");
 const QRCode = require("qrcode");
 const path = require("path");
@@ -8,14 +8,41 @@ let sock = null;
 let connectionStatus = "disconnected"; // 'disconnected', 'connecting', 'qr', 'connected'
 let lastQr = null;
 
+function clearAuthDir(authDir) {
+  try {
+    if (fs.existsSync(authDir)) {
+      const files = fs.readdirSync(authDir);
+      for (const file of files) {
+        fs.unlinkSync(path.join(authDir, file));
+      }
+    }
+  } catch (e) {
+    console.error("Error clearing auth info:", e);
+  }
+}
+
 async function connectToWhatsApp() {
   const authDir = path.join(__dirname, "auth_info_baileys");
   const { state, saveCreds } = await useMultiFileAuthState(authDir);
 
+  let version;
+  try {
+    const latest = await fetchLatestBaileysVersion();
+    version = latest.version;
+    console.log(`Using Baileys version: v${version.join('.')}`);
+  } catch (e) {
+    console.warn("Could not fetch latest Baileys version, using default fallback:", e.message);
+  }
+
   sock = makeWASocket({
+    version,
     auth: state,
-    printQRInTerminal: true,
-    defaultQueryTimeoutMs: undefined,
+    browser: Browsers.macOS("Desktop"),
+    syncFullHistory: false,
+    markOnlineOnConnect: true,
+    connectTimeoutMs: 60000,
+    defaultQueryTimeoutMs: 60000,
+    keepAliveIntervalMs: 25000,
   });
 
   sock.ev.on("connection.update", async (update) => {
@@ -31,30 +58,20 @@ async function connectToWhatsApp() {
     }
 
     if (connection === "close") {
-      const shouldReconnect = lastDisconnect?.error?.output?.statusCode !== DisconnectReason.loggedOut;
-      console.log("Connection closed, reconnecting: ", shouldReconnect);
+      const statusCode = lastDisconnect?.error?.output?.statusCode;
+      const shouldReconnect = statusCode !== DisconnectReason.loggedOut && statusCode !== 401;
+      console.log(`Connection closed (statusCode: ${statusCode}), shouldReconnect: ${shouldReconnect}`);
       connectionStatus = "disconnected";
       lastQr = null;
-      
-      if (shouldReconnect) {
-        setTimeout(connectToWhatsApp, 3000);
-      } else {
-        console.log("Logged out from WhatsApp. Clearing auth info and generating new QR.");
-        try {
-          const authDir = path.join(__dirname, "auth_info_baileys");
-          if (fs.existsSync(authDir)) {
-            const files = fs.readdirSync(authDir);
-            for (const file of files) {
-              fs.unlinkSync(path.join(authDir, file));
-            }
-          }
-        } catch (e) {
-          console.error("Error clearing auth info:", e);
-        }
-        setTimeout(connectToWhatsApp, 2000);
+
+      if (!shouldReconnect || statusCode === 401 || statusCode === 403) {
+        console.log("Logged out or session invalid. Clearing auth info directory...");
+        clearAuthDir(authDir);
       }
+      
+      setTimeout(connectToWhatsApp, 3000);
     } else if (connection === "open") {
-      console.log("Opened connection successfully");
+      console.log("Opened connection successfully to WhatsApp Web!");
       connectionStatus = "connected";
       lastQr = null;
     } else if (connection === "connecting") {
