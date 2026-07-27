@@ -49,7 +49,7 @@ export async function createEmprestimo(formData: FormData) {
   }
 
   // Criar empréstimo e parcelas associadas em uma transação do Prisma
-  await prisma.$transaction(async (tx) => {
+  const resultEmprestimo = await prisma.$transaction(async (tx) => {
     const emprestimo = await tx.emprestimo.create({
       data: {
         cliente_id: clienteId,
@@ -78,10 +78,12 @@ export async function createEmprestimo(formData: FormData) {
         status: "aberto",
       })),
     });
+
+    return emprestimo;
   });
 
   revalidatePath("/emprestimos");
   revalidatePath("/clientes");
   
-  return { success: true, redirectUrl: "/emprestimos" };
+  return { success: true, emprestimo: resultEmprestimo, redirectUrl: "/emprestimos" };
 }

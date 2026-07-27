@@ -205,7 +205,10 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         formData.append('telefone', newClientData.phone || '');
         formData.append('cidade', newClientData.city || '');
         formData.append('limiteCredito', String(newClientData.creditLimit || 5000));
-        await createCliente(formData);
+        const res = await createCliente(formData);
+        if (res?.client?.id) {
+          setClients(prev => prev.map(c => c.id === tempId ? { ...c, id: res.client.id } : c));
+        }
       } catch (err) {
         console.error('Erro ao salvar cliente no backend:', err);
       }
@@ -269,7 +272,10 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         }));
         formData.append('parcelasJson', JSON.stringify(parcelasArr));
 
-        await createEmprestimo(formData);
+        const res = await createEmprestimo(formData);
+        if (res?.emprestimo?.id) {
+          setLoans(prev => prev.map(l => l.id === tempId ? { ...l, id: res.emprestimo.id } : l));
+        }
       } catch (err) {
         console.error('Erro ao salvar empréstimo no backend:', err);
       }

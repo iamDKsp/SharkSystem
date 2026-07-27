@@ -24,7 +24,7 @@ export async function createCliente(formData: FormData) {
   // 2. Processar Documentos (Base64)
   const documentosUrlsStr = formData.get("documentosBase64") as string | null;
 
-  await prisma.cliente.create({
+  const newCliente = await prisma.cliente.create({
     data: {
       nome: nome.trim(),
       telefone: telefone.replace(/\D/g, ""), // Apenas números
@@ -42,5 +42,5 @@ export async function createCliente(formData: FormData) {
   });
 
   revalidatePath("/clientes");
-  return { success: true, redirectUrl: "/clientes" };
+  return { success: true, client: newCliente, redirectUrl: "/clientes" };
 }
