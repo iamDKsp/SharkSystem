@@ -75,14 +75,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     reader.readAsDataURL(file);
   };
 
-  const handleSaveProfileData = (e: React.FormEvent) => {
+  const handleSaveProfileData = async (e: React.FormEvent) => {
     e.preventDefault();
     setUserName(nameInput);
+    try {
+      await fetch('/api/perfil', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nome: nameInput }),
+      });
+    } catch (err) {
+      console.error("Erro ao salvar nome no servidor:", err);
+    }
     setProfileSavedMsg(true);
     setTimeout(() => setProfileSavedMsg(false), 3000);
   };
 
-  const handleUpdatePassword = (e: React.FormEvent) => {
+  const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setPasswordError('');
     setPasswordSuccess(false);
@@ -97,11 +106,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       return;
     }
 
-    setUserPassword(newPassword);
-    setPasswordSuccess(true);
-    setNewPassword('');
-    setConfirmPassword('');
-    setTimeout(() => setPasswordSuccess(false), 4000);
+    try {
+      const res = await fetch('/api/perfil', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: newPassword }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || data.error) {
+        setPasswordError(data.error || 'Erro ao atualizar a senha no servidor.');
+        return;
+      }
+
+      setUserPassword(newPassword);
+      setPasswordSuccess(true);
+      setNewPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setPasswordSuccess(false), 4000);
+    } catch (err) {
+      setPasswordError('Erro de conexão ao salvar a senha.');
+    }
   };
 
   const [liveQr, setLiveQr] = useState<string | null>(null);

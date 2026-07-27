@@ -7,6 +7,36 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.JWT_SECRET || "solucoes-financeiras-super-secret-key-2026"
 );
 
+export async function GET(request: Request) {
+  try {
+    const token = request.headers.get("cookie")?.split("; ").find(c => c.startsWith("sol_auth_token="))?.split("=")[1];
+    
+    if (!token) {
+      return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
+    }
+
+    const verified = await jwtVerify(token, JWT_SECRET);
+    const userId = verified.payload.sub;
+
+    if (!userId) {
+      return NextResponse.json({ error: "Token inválido" }, { status: 401 });
+    }
+
+    const perfil = await prisma.perfil.findUnique({
+      where: { id: String(userId) },
+      select: { id: true, nome: true, email: true }
+    });
+
+    if (!perfil) {
+      return NextResponse.json({ error: "Perfil não encontrado" }, { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, perfil });
+  } catch (error) {
+    return NextResponse.json({ error: "Erro interno" }, { status: 500 });
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const token = request.headers.get("cookie")?.split("; ").find(c => c.startsWith("sol_auth_token="))?.split("=")[1];
@@ -22,9 +52,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Token inválido" }, { status: 401 });
     }
 
-    const { email, password } = await request.json();
+    const { nome, email, password } = await request.json();
 
     const updateData: any = {};
+    if (nome) updateData.nome = nome;
     if (email) updateData.email = email;
     if (password) updateData.senha = await bcrypt.hash(password, 10);
 
@@ -33,7 +64,7 @@ export async function POST(request: Request) {
     }
 
     await prisma.perfil.update({
-      where: { id: userId },
+      where: { id: String(userId) },
       data: updateData,
     });
 

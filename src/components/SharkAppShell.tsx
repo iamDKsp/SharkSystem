@@ -82,10 +82,22 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
   const [cheques, setCheques] = useState<ChequeItem[]>(initialCheques);
 
   // User & Settings state
-  const [userName, setUserName] = useState('Eduardo Finanças');
-  const [userEmail, setUserEmail] = useState('eduardo@sharkfinanceira.com.br');
+  const [userName, setUserName] = useState('Roni Gabriel');
+  const [userEmail, setUserEmail] = useState('ronigabrieloscar@hotmail.com');
   const [userPassword, setUserPassword] = useState('123456');
   const [avatarUrl, setAvatarUrl] = useState<string | null>('/shark-avatar.png');
+
+  React.useEffect(() => {
+    fetch('/api/perfil')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.perfil) {
+          if (data.perfil.nome) setUserName(data.perfil.nome);
+          if (data.perfil.email) setUserEmail(data.perfil.email);
+        }
+      })
+      .catch(err => console.error("Erro ao carregar perfil do operador:", err));
+  }, []);
 
   // Phone connection
   const [qrConnected, setQrConnected] = useState(true);
