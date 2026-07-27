@@ -11,6 +11,8 @@ interface WhatsAppModalProps {
   dueDate: string;
   daysOverdue?: number;
   templateType?: 'lembrete' | 'atraso' | 'notificacao';
+  loanId?: string;
+  onMarkCobrado?: (loanId: string) => Promise<void>;
 }
 
 export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
@@ -23,9 +25,13 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
   dueDate,
   daysOverdue = 0,
   templateType = 'lembrete',
+  loanId,
+  onMarkCobrado,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [sendMethod, setSendMethod] = useState<'app' | 'server'>('app');
   const [currentTemplate, setCurrentTemplate] = useState<'lembrete' | 'atraso' | 'notificacao'>(templateType);
+  const [isSendingServer, setIsSendingServer] = useState(false);
 
   if (!isOpen) return null;
 
@@ -54,10 +60,36 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleSendWhatsApp = () => {
-    const encodedText = encodeURIComponent(messageText);
-    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedText}`;
-    window.open(whatsappUrl, '_blank');
+  const handleSendWhatsApp = async () => {
+    if (loanId && onMarkCobrado) {
+      try {
+        await onMarkCobrado(loanId);
+      } catch (e) {
+        console.error("Erro ao registrar cobrança:", e);
+      }
+    }
+
+    if (sendMethod === 'server') {
+      try {
+        setIsSendingServer(true);
+        await fetch('/api/whatsapp/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: formattedPhone, message: messageText }),
+        });
+        alert(`Cobrança disparada com sucesso via servidor Baileys para ${clientName}!`);
+        onClose();
+      } catch (err) {
+        console.error("Erro no envio pelo servidor, abrindo App:", err);
+        const encodedText = encodeURIComponent(messageText);
+        window.open(`https://wa.me/${formattedPhone}?text=${encodedText}`, '_blank');
+      } finally {
+        setIsSendingServer(false);
+      }
+    } else {
+      const encodedText = encodeURIComponent(messageText);
+      window.open(`https://wa.me/${formattedPhone}?text=${encodedText}`, '_blank');
+    }
   };
 
   return (
@@ -88,7 +120,26 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 my-4">
+        <div className="grid grid-cols-2 gap-2 my-3 p-1 rounded-xl bg-[#0B0F17] border border-[#1F2937]">
+          <button
+            onClick={() => setSendMethod('app')}
+            className={`py-1.5 px-2 rounded-lg text-xs font-bold transition ${
+              sendMethod === 'app' ? 'bg-[#00D084] text-slate-950 shadow-sm' : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            📱 Abrir Web / App
+          </button>
+          <button
+            onClick={() => setSendMethod('server')}
+            className={`py-1.5 px-2 rounded-lg text-xs font-bold transition ${
+              sendMethod === 'server' ? 'bg-[#00D084] text-slate-950 shadow-sm' : 'text-gray-400 hover:text-white'
+            }`}
+          >
+            🤖 Servidor Baileys
+          </button>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 my-3">
           <button
             onClick={() => setCurrentTemplate('lembrete')}
             className={`py-2 px-2 rounded-xl text-[11px] font-bold border transition ${
@@ -145,10 +196,11 @@ export const WhatsAppModal: React.FC<WhatsAppModalProps> = ({
 
           <button
             onClick={handleSendWhatsApp}
-            className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#00D084] to-[#10B981] text-slate-950 font-black text-xs flex items-center justify-center gap-2 hover:brightness-110 transition shadow-[0_0_15px_rgba(0,208,132,0.3)]"
+            disabled={isSendingServer}
+            className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#00D084] to-[#10B981] text-slate-950 font-black text-xs flex items-center justify-center gap-2 hover:brightness-110 transition shadow-[0_0_15px_rgba(0,208,132,0.3)] disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
-            <span>Abrir WhatsApp</span>
+            <span>{isSendingServer ? 'Disparando...' : sendMethod === 'server' ? 'Enviar pelo Servidor' : 'Abrir WhatsApp'}</span>
           </button>
         </div>
       </div>

@@ -6,12 +6,18 @@ interface EmprestimosViewProps {
   loans: Loan[];
   onOpenQuickAction: () => void;
   onOpenWhatsApp: (clientName: string, phone: string, loanCode: string, amount: number, dueDate: string) => void;
+  onRenegociar?: (loan: Loan) => void;
+  onReprogramar?: (loan: Loan) => void;
+  onReceberSoJuros?: (loan: Loan) => void;
 }
 
 export const EmprestimosView: React.FC<EmprestimosViewProps> = ({
   loans,
   onOpenQuickAction,
   onOpenWhatsApp,
+  onRenegociar,
+  onReprogramar,
+  onReceberSoJuros,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'todos' | LoanStatus>('todos');
@@ -148,6 +154,31 @@ export const EmprestimosView: React.FC<EmprestimosViewProps> = ({
                     style={{ width: `${progressPercent}%` }}
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-1 border-t border-[#1F2937]/50">
+                <button
+                  onClick={() => onRenegociar && onRenegociar(loan)}
+                  className="py-1.5 px-2 rounded-xl bg-[#151D2D] text-gray-300 hover:text-white border border-[#1F2937] text-[10px] font-bold flex items-center justify-center gap-1 transition"
+                >
+                  <RefreshCw className="w-3 h-3 text-[#00D084]" />
+                  <span>Abater / Renegociar</span>
+                </button>
+
+                <button
+                  onClick={() => onReprogramar && onReprogramar(loan)}
+                  className="py-1.5 px-2 rounded-xl bg-[#151D2D] text-gray-300 hover:text-white border border-[#1F2937] text-[10px] font-bold flex items-center justify-center gap-1 transition"
+                >
+                  <Calculator className="w-3 h-3 text-[#00D084]" />
+                  <span>Reprogramar</span>
+                </button>
+
+                <button
+                  onClick={() => onReceberSoJuros && onReceberSoJuros(loan)}
+                  className="py-1.5 px-2 rounded-xl bg-amber-500/10 text-amber-400 hover:bg-amber-500 hover:text-slate-950 border border-amber-500/20 text-[10px] font-bold flex items-center justify-center gap-1 transition"
+                >
+                  <span>Receber Só Juros</span>
+                </button>
               </div>
 
               <div className="flex items-center justify-between pt-2 border-t border-[#1F2937]">

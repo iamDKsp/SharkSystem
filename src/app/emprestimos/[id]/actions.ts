@@ -395,3 +395,17 @@ export async function receberSoJurosEmprestimo(emprestimoId: string) {
   revalidatePath("/clientes");
   return { success: true };
 }
+
+// 8. Marcar Empréstimo como Cobrado Hoje
+export async function marcarEmprestimoComoCobrado(emprestimoId: string) {
+  const hoje = new Date();
+  await prisma.emprestimo.update({
+    where: { id: emprestimoId },
+    data: { cobrado_em: hoje },
+  });
+
+  revalidatePath(`/emprestimos/${emprestimoId}`);
+  revalidatePath("/emprestimos");
+  revalidatePath("/cobrancas");
+  return { success: true, cobradoEm: hoje.toISOString() };
+}

@@ -16,6 +16,7 @@ import {
   Clock
 } from 'lucide-react';
 import { Client, Loan, PaymentReceipt, Partner } from '../types';
+import { UploadAnexoDocumentos } from './UploadAnexoDocumentos';
 
 interface QuickActionModalProps {
   isOpen: boolean;
@@ -178,8 +179,20 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({
   const [interestRate, setInterestRate] = useState<number>(10);
   const [installmentsCount, setInstallmentsCount] = useState<number>(1);
   const [periodicity, setPeriodicity] = useState<'diario' | 'semanal' | 'quinzena' | 'mensal'>('mensal');
-  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  
+  const [autoLateFee, setAutoLateFee] = useState<boolean>(true);
+  const [lateFeeRate, setLateFeeRate] = useState<number>(2);
+  const [observations, setObservations] = useState<string>('');
 
+  const [clientName, setClientName] = useState('');
+  const [clientDocument, setClientDocument] = useState('');
+  const [clientPhone, setClientPhone] = useState('');
+  const [clientCity, setClientCity] = useState('Bauru - SP');
+  const [creditLimit, setCreditLimit] = useState(10000);
+
+  const [clientFotoUrl, setClientFotoUrl] = useState('');
+  const [clientDocs, setClientDocs] = useState<string[]>([]);
   const [selectedLoanId, setSelectedLoanId] = useState(loans[0]?.id || '');
   const [receiptAmount, setReceiptAmount] = useState<number>(1000);
   const [paymentMethod, setPaymentMethod] = useState<'PIX' | 'Dinheiro' | 'Transferência'>('PIX');
@@ -195,10 +208,6 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({
       setSelectedLoanId(loans[0].id);
     }
   }, [loans, selectedLoanId]);
-
-  const [autoLateFee, setAutoLateFee] = useState<boolean>(true);
-  const [lateFeeRate, setLateFeeRate] = useState<number>(2);
-  const [observations, setObservations] = useState<string>('');
 
   const calculateTotal = () => {
     const numAmount = Number(amount) || 0;
@@ -216,12 +225,6 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({
   const totalToReceive = calculateTotal();
   const safeInstallmentsCount = Math.max(1, Number(installmentsCount) || 1);
   const installmentAmount = safeInstallmentsCount > 0 ? totalToReceive / safeInstallmentsCount : totalToReceive;
-
-  const [clientName, setClientName] = useState('');
-  const [clientDocument, setClientDocument] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [clientCity, setClientCity] = useState('Bauru - SP');
-  const [creditLimit, setCreditLimit] = useState(10000);
 
   if (!isOpen) return null;
 
@@ -729,6 +732,7 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({
                   </label>
                   <input
                     type="text"
+                    placeholder="Bauru - SP"
                     value={clientCity}
                     onChange={(e) => setClientCity(e.target.value)}
                     className="w-full min-h-[48px] bg-[#090D16] border border-[#1E293B] rounded-2xl px-4 text-xs text-white focus:outline-none focus:border-[#00D084]"
@@ -737,16 +741,24 @@ export const QuickActionModal: React.FC<QuickActionModalProps> = ({
 
                 <div>
                   <label className="block text-xs font-bold text-gray-300 mb-1.5">
-                    Limite Pré-Aprovado (R$)
+                    Limite de Crédito (R$)
                   </label>
                   <input
                     type="number"
-                    step="500"
                     value={creditLimit}
                     onChange={(e) => setCreditLimit(Number(e.target.value))}
-                    className="w-full min-h-[48px] bg-[#090D16] border border-[#1E293B] rounded-2xl px-4 text-xs text-white focus:outline-none focus:border-[#00D084] font-mono"
+                    className="w-full min-h-[48px] bg-[#090D16] border border-[#1E293B] rounded-2xl px-4 text-xs text-white focus:outline-none focus:border-[#00D084]"
                   />
                 </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[#090D16] border border-[#1E293B]">
+                <UploadAnexoDocumentos
+                  fotoUrl={clientFotoUrl}
+                  onFotoChange={setClientFotoUrl}
+                  documentosUrls={clientDocs}
+                  onDocumentosChange={setClientDocs}
+                />
               </div>
             </form>
           )}

@@ -34,9 +34,20 @@ import {
   ChequeItem 
 } from '../types';
 
+import { RenegociacaoModal } from './RenegociacaoModal';
+import { ReprogramacaoModal } from './ReprogramacaoModal';
+import { RenovacaoJurosModal } from './RenovacaoJurosModal';
+
 import { createCliente } from '@/app/clientes/novo/actions';
 import { createEmprestimo } from '@/app/emprestimos/novo/actions';
-import { payNextInstallment, deleteLoan } from '@/app/emprestimos/[id]/actions';
+import { 
+  payNextInstallment, 
+  deleteLoan, 
+  renegociarEmprestimo, 
+  reprogramarEmprestimo, 
+  receberSoJurosEmprestimo, 
+  marcarEmprestimoComoCobrado 
+} from '@/app/emprestimos/[id]/actions';
 import { createParceiro, deleteParceiro } from '@/app/parceiros/actions';
 import { createCheque, updateChequeStatus, deleteCheque } from '@/app/cheques/actions';
 
@@ -86,6 +97,12 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isProfilePopupOpen, setIsProfilePopupOpen] = useState(false);
 
+  // Advanced Loan Modals state
+  const [selectedLoanForAction, setSelectedLoanForAction] = useState<Loan | null>(null);
+  const [isRenegociacaoOpen, setIsRenegociacaoOpen] = useState(false);
+  const [isReprogramacaoOpen, setIsReprogramacaoOpen] = useState(false);
+  const [isRenovacaoJurosOpen, setIsRenovacaoJurosOpen] = useState(false);
+
   // WhatsApp Modal state
   const [whatsAppModalData, setWhatsAppModalData] = useState<{
     isOpen: boolean;
@@ -95,6 +112,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
     amount: number;
     dueDate: string;
     daysOverdue?: number;
+    loanId?: string;
   }>({
     isOpen: false,
     clientName: '',
@@ -335,7 +353,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
     });
   };
 
-  const openWhatsApp = (clientName: string, phone: string, loanCode: string, amount: number, dueDate: string, daysOverdue?: number) => {
+  const openWhatsApp = (clientName: string, phone: string, loanCode: string, amount: number, dueDate: string, daysOverdue?: number, loanId?: string) => {
     setWhatsAppModalData({
       isOpen: true,
       clientName,
@@ -344,6 +362,68 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
       amount,
       dueDate,
       daysOverdue,
+      loanId,
+    });
+  };
+
+  const handleOpenRenegociacao = (loan: Loan) => {
+    setSelectedLoanForAction(loan);
+    setIsRenegociacaoOpen(true);
+  };
+
+  const handleOpenReprogramacao = (loan: Loan) => {
+    setSelectedLoanForAction(loan);
+    setIsReprogramacaoOpen(true);
+  };
+
+  const handleOpenRenovacaoJuros = (loan: Loan) => {
+    setSelectedLoanForAction(loan);
+    setIsRenovacaoJurosOpen(true);
+  };
+
+  const handleConfirmRenegociacao = async (loanId: string, valorAbater: number, aplicarNovosJuros: boolean, novaTaxa: number) => {
+    startTransition(async () => {
+      try {
+        await renegociarEmprestimo(loanId, valorAbater, aplicarNovosJuros, novaTaxa);
+      } catch (err) {
+        console.error('Erro na renegociação:', err);
+      }
+    });
+  };
+
+  const handleConfirmReprogramacao = async (
+    loanId: string, 
+    novaDataVencimento: string, 
+    principalExtra: number, 
+    taxaJuros: number, 
+    frequencia: string
+  ) => {
+    startTransition(async () => {
+      try {
+        await reprogramarEmprestimo(loanId, novaDataVencimento, principalExtra, taxaJuros, frequencia);
+      } catch (err) {
+        console.error('Erro na reprogramação:', err);
+      }
+    });
+  };
+
+  const handleConfirmRenovacaoJuros = async (loanId: string) => {
+    startTransition(async () => {
+      try {
+        await receberSoJurosEmprestimo(loanId);
+      } catch (err) {
+        console.error('Erro na renovação de juros:', err);
+      }
+    });
+  };
+
+  const handleMarkCobrado = async (loanId: string) => {
+    startTransition(async () => {
+      try {
+        await marcarEmprestimoComoCobrado(loanId);
+      } catch (err) {
+        console.error('Erro ao marcar cobrado:', err);
+      }
     });
   };
 
@@ -404,6 +484,9 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
             loans={loans}
             onOpenQuickAction={() => setIsQuickActionOpen(true)}
             onOpenWhatsApp={openWhatsApp}
+            onRenegociar={handleOpenRenegociacao}
+            onReprogramar={handleOpenReprogramacao}
+            onReceberSoJuros={handleOpenRenovacaoJuros}
           />
         )}
 
@@ -520,6 +603,29 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
         amount={whatsAppModalData.amount}
         dueDate={whatsAppModalData.dueDate}
         daysOverdue={whatsAppModalData.daysOverdue}
+        loanId={whatsAppModalData.loanId}
+        onMarkCobrado={handleMarkCobrado}
+      />
+
+      <RenegociacaoModal
+        isOpen={isRenegociacaoOpen}
+        onClose={() => setIsRenegociacaoOpen(false)}
+        loan={selectedLoanForAction}
+        onConfirm={handleConfirmRenegociacao}
+      />
+
+      <ReprogramacaoModal
+        isOpen={isReprogramacaoOpen}
+        onClose={() => setIsReprogramacaoOpen(false)}
+        loan={selectedLoanForAction}
+        onConfirm={handleConfirmReprogramacao}
+      />
+
+      <RenovacaoJurosModal
+        isOpen={isRenovacaoJurosOpen}
+        onClose={() => setIsRenovacaoJurosOpen(false)}
+        loan={selectedLoanForAction}
+        onConfirm={handleConfirmRenovacaoJuros}
       />
 
     </div>
