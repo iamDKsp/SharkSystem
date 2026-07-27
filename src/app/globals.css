@@ -28,7 +28,7 @@
 }
 
 html.light {
-  --background: #ffffff;
+  --background: #f8fafc;
   --foreground: #0f172a;
   
   --primary: #00d084;
@@ -41,6 +41,103 @@ html.light {
   --muted-foreground: #64748b;
   
   --border: #e2e8f0;
+}
+
+/* =========================================================
+   LIGHT MODE GLOBAL OVERRIDES
+   Garante fundo branco e contraste perfeito em todas as telas
+   ========================================================= */
+
+html.light,
+html.light body,
+html.light main {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+/* Containers e Cards de Fundo Escuro */
+html.light .bg-\[\#090D16\],
+html.light .bg-\[\#0B0F17\],
+html.light .bg-\[\#0F172A\],
+html.light .bg-\[\#111827\],
+html.light .bg-\[\#151D2D\],
+html.light .bg-\[\#1E293B\],
+html.light .bg-\[\#080B11\],
+html.light .bg-\[\#05080E\],
+html.light .bg-\[\#0A0E1A\] {
+  background-color: #ffffff !important;
+}
+
+/* Semi-transparentes */
+html.light .bg-\[\#0B0F17\]\/95,
+html.light .bg-\[\#0B0F17\]\/90,
+html.light .bg-\[\#0B0F17\]\/80,
+html.light .bg-\[\#0F172A\]\/95,
+html.light .bg-\[\#111827\]\/95,
+html.light .bg-\[\#090D16\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+html.light .bg-\[\#151D2D\]\/50,
+html.light .bg-\[\#1E293B\]\/50,
+html.light .bg-\[\#1E293B\]\/40 {
+  background-color: #f1f5f9 !important;
+}
+
+/* Bordas */
+html.light .border-\[\#1E293B\],
+html.light .border-\[\#1F2937\],
+html.light .border-\[\#151D2D\],
+html.light .border-\[\#0F172A\],
+html.light .border-zinc-800,
+html.light .border-zinc-700 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Textos principais e secundários em Light Mode */
+html.light .text-white {
+  color: #0f172a !important;
+}
+
+html.light .text-gray-200,
+html.light .text-zinc-200,
+html.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light .text-gray-300,
+html.light .text-gray-400,
+html.light .text-slate-400,
+html.light .text-zinc-400,
+html.light .text-zinc-500 {
+  color: #475569 !important;
+}
+
+/* Preservar cores de botões e destaques */
+html.light .text-slate-950,
+html.light .text-emerald-400,
+html.light .text-\[\#00D084\] {
+  /* mantém cores originais de destaque */
+}
+
+/* Inputs, Selects, Textareas em Light Mode */
+html.light input:not([type="checkbox"]):not([type="radio"]),
+html.light select,
+html.light textarea {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+
+html.light input::placeholder,
+html.light textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Modais e Overlays */
+html.light .bg-black\/80,
+html.light .bg-black\/70 {
+  background-color: rgba(15, 23, 42, 0.4) !important;
 }
 
 html.dark {

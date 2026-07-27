@@ -148,15 +148,14 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('shark_theme') as 'dark' | 'light' | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      if (savedTheme === 'light') {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-      } else {
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
-      }
+    if (savedTheme === 'light') {
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+    } else {
+      setTheme('dark');
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
     }
 
     const savedSettings = localStorage.getItem('shark_system_settings');
@@ -508,7 +507,7 @@ export const SharkAppShell: React.FC<SharkAppShellProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#090D16] light:bg-slate-50 text-white light:text-slate-900 flex flex-col font-sans selection:bg-[#00D084] selection:text-slate-950">
+    <div className="min-h-screen bg-[#090D16] text-white flex flex-col font-sans selection:bg-[#00D084] selection:text-slate-950">
       
       <Header
         currentView={currentView}
