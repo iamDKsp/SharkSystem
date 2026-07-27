@@ -339,16 +339,19 @@ export async function receberSoJurosEmprestimo(emprestimoId: string) {
     // 2. Pega a primeira parcela pendente (aberta ou atrasada)
     const parcelaAtual = emprestimo.parcelas[0];
 
-    // 3. Calcula juros do empréstimo (baseado no valor original emprestado ou taxa)
+    // 3. Salva o valor original ANTES de qualquer modificação (crítico para o bug fix)
+    const valorOriginalParcela = Number(parcelaAtual.valor);
+
+    // 4. Calcula juros do empréstimo (baseado no valor original emprestado ou taxa)
     const valorEmprestado = Number(emprestimo.valor_emprestado);
     const taxaJuros = Number(emprestimo.taxa_juros);
-    const valorJuros = taxaJuros > 0 ? valorEmprestado * (taxaJuros / 100) : Number(parcelaAtual.valor);
+    const valorJuros = taxaJuros > 0 ? valorEmprestado * (taxaJuros / 100) : valorOriginalParcela;
 
     if (valorJuros <= 0) {
       throw new Error("O empréstimo não possui taxa de juros configurada para calcular o recebimento.");
     }
 
-    // 4. Modifica a parcela atual para ser APENAS o valor dos juros, e marca como paga
+    // 5. Modifica a parcela atual para ser APENAS o valor dos juros, e marca como paga
     await tx.parcela.update({
       where: { id: parcelaAtual.id },
       data: {
@@ -359,7 +362,7 @@ export async function receberSoJurosEmprestimo(emprestimoId: string) {
       },
     });
 
-    // 5. Cria uma NOVA parcela com o valor integral original (Principal + Juros)
+    // 6. Cria uma NOVA parcela com o valor integral original (antes da modificação acima)
     // O vencimento será +1 mês em relação à parcela atual.
     const novoVencimento = new Date(parcelaAtual.data_vencimento);
     novoVencimento.setUTCMonth(novoVencimento.getUTCMonth() + 1);
@@ -375,7 +378,7 @@ export async function receberSoJurosEmprestimo(emprestimoId: string) {
       data: {
         emprestimo_id: emprestimoId,
         numero: novoNumero,
-        valor: parcelaAtual.valor, // Valor cheio da parcela original que foi postergada
+        valor: valorOriginalParcela, // Usa o valor original capturado antes da atualização
         data_vencimento: novoVencimento,
         status: "aberto",
       },
